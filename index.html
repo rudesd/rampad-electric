@@ -302,18 +302,6 @@
             letter-spacing: 0.05em;
         }
 
-        .badge-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-success);
-            border: 1px solid var(--accent-success);
-        }
-
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--accent-warning);
-            border: 1px solid var(--accent-warning);
-        }
-
         .badge-info {
             background: rgba(0, 217, 255, 0.1);
             color: var(--accent-primary);
@@ -478,6 +466,10 @@
             <div id="configAlert" class="alert"></div>
             <div class="config-grid">
                 <div class="config-field">
+                    <label for="backendUrl">Backend Server URL</label>
+                    <input type="text" id="backendUrl" placeholder="http://localhost:3000" value="http://localhost:3000">
+                </div>
+                <div class="config-field">
                     <label for="gaPropertyId">Google Analytics Property ID</label>
                     <input type="text" id="gaPropertyId" placeholder="properties/123456789">
                 </div>
@@ -496,7 +488,7 @@
             </div>
             <button class="save-config-btn" onclick="saveConfig()">Save Configuration</button>
             <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                💡 Your credentials are stored locally in your browser and never sent anywhere except to Google/Jetpack APIs.
+                💡 Your credentials are stored locally and sent only to your backend server.
             </p>
         </div>
 
@@ -573,7 +565,7 @@
                     <tbody id="tableBody">
                         <tr>
                             <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                Configure your API credentials above and click "Refresh Data" to load analytics
+                                Configure your backend server and credentials above, then click "Refresh Data"
                             </td>
                         </tr>
                     </tbody>
@@ -593,6 +585,7 @@
             const saved = localStorage.getItem(CONFIG_KEY);
             if (saved) {
                 const config = JSON.parse(saved);
+                document.getElementById('backendUrl').value = config.backendUrl || 'http://localhost:3000';
                 document.getElementById('gaPropertyId').value = config.gaPropertyId || '';
                 document.getElementById('gaApiKey').value = config.gaApiKey || '';
                 document.getElementById('jetpackSiteId').value = config.jetpackSiteId || '';
@@ -604,13 +597,14 @@
 
         function saveConfig() {
             const config = {
+                backendUrl: document.getElementById('backendUrl').value,
                 gaPropertyId: document.getElementById('gaPropertyId').value,
                 gaApiKey: document.getElementById('gaApiKey').value,
                 jetpackSiteId: document.getElementById('jetpackSiteId').value,
                 jetpackToken: document.getElementById('jetpackToken').value
             };
 
-            if (!config.gaPropertyId || !config.gaApiKey || !config.jetpackSiteId || !config.jetpackToken) {
+            if (!config.backendUrl || !config.gaPropertyId || !config.gaApiKey || !config.jetpackSiteId || !config.jetpackToken) {
                 showAlert('Please fill in all configuration fields', 'error');
                 return;
             }
@@ -618,7 +612,6 @@
             localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
             showAlert('Configuration saved successfully!', 'success');
             
-            // Auto-refresh data after saving config
             setTimeout(() => refreshData(), 1000);
         }
 
@@ -632,65 +625,44 @@
         }
 
         // ==========================================
-        // GOOGLE ANALYTICS 4 API INTEGRATION
+        // API CALLS TO BACKEND
         // ==========================================
         
         async function fetchGoogleAnalytics(config) {
-            const propertyId = config.gaPropertyId;
-            const apiKey = config.gaApiKey;
-            
-            // Get date range (last 7 days)
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 7);
-            
-            const formatDate = (date) => date.toISOString().split('T')[0];
-            
-            try {
-                // Fetch metrics using GA4 Data API
-                const response = await fetch(
-                    `https://analyticsdata.googleapis.com/v1beta/${propertyId}:runReport?key=${apiKey}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            dateRanges: [
-                                {
-                                    startDate: formatDate(startDate),
-                                    endDate: formatDate(endDate)
-                                }
-                            ],
-                            dimensions: [
-                                { name: 'date' },
-                                { name: 'sessionDefaultChannelGroup' },
-                                { name: 'pagePath' }
-                            ],
-                            metrics: [
-                                { name: 'activeUsers' },
-                                { name: 'screenPageViews' },
-                                { name: 'bounceRate' },
-                                { name: 'averageSessionDuration' }
-                            ]
-                        })
-                    }
-                );
+            const response = await fetch(`${config.backendUrl}/api/ga4`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    propertyId: config.gaPropertyId,
+                    apiKey: config.gaApiKey
+                })
+            });
 
-                if (!response.ok) {
-                    throw new Error(`GA4 API error: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return processGA4Data(data);
-            } catch (error) {
-                console.error('Google Analytics fetch error:', error);
-                throw error;
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'GA4 API error');
             }
+
+            const data = await response.json();
+            return processGA4Data(data);
+        }
+
+        async function fetchJetpackStats(config) {
+            const response = await fetch(
+                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${config.jetpackToken}`
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Jetpack API error');
+            }
+
+            return await response.json();
         }
 
         function processGA4Data(data) {
-            // Process the GA4 API response
             const processed = {
                 totalVisitors: 0,
                 totalPageViews: 0,
@@ -712,24 +684,20 @@
                 const bounce = parseFloat(row.metricValues[2].value);
                 const duration = parseFloat(row.metricValues[3].value);
 
-                // Aggregate totals
                 processed.totalVisitors += users;
                 processed.totalPageViews += views;
 
-                // Daily data
                 if (!processed.dailyData[date]) {
                     processed.dailyData[date] = { visitors: 0, views: 0 };
                 }
                 processed.dailyData[date].visitors += users;
                 processed.dailyData[date].views += views;
 
-                // Sources
                 if (!processed.sources[source]) {
                     processed.sources[source] = 0;
                 }
                 processed.sources[source] += users;
 
-                // Top pages
                 if (!processed.topPages[page]) {
                     processed.topPages[page] = {
                         views: 0,
@@ -748,46 +716,6 @@
         }
 
         // ==========================================
-        // JETPACK API INTEGRATION
-        // ==========================================
-        
-        async function fetchJetpackStats(config) {
-            const siteId = config.jetpackSiteId;
-            const token = config.jetpackToken;
-            
-            try {
-                // Jetpack Stats API endpoint
-                const response = await fetch(
-                    `https://public-api.wordpress.com/rest/v1.1/sites/${siteId}/stats`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`Jetpack API error: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return processJetpackData(data);
-            } catch (error) {
-                console.error('Jetpack fetch error:', error);
-                throw error;
-            }
-        }
-
-        function processJetpackData(data) {
-            return {
-                visitors: data.stats?.visitors || 0,
-                views: data.stats?.views || 0,
-                topPosts: data.top_posts || [],
-                topReferrers: data.top_referrers || []
-            };
-        }
-
-        // ==========================================
         // CHART INITIALIZATION
         // ==========================================
         
@@ -802,10 +730,7 @@
                     legend: {
                         labels: {
                             color: '#e5e7eb',
-                            font: {
-                                family: 'Outfit',
-                                size: 12
-                            },
+                            font: { family: 'Outfit', size: 12 },
                             usePointStyle: true,
                             padding: 20
                         }
@@ -813,33 +738,16 @@
                 },
                 scales: {
                     x: {
-                        grid: {
-                            color: '#2d3748',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#9ca3af',
-                            font: {
-                                family: 'JetBrains Mono'
-                            }
-                        }
+                        grid: { color: '#2d3748', drawBorder: false },
+                        ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono' } }
                     },
                     y: {
-                        grid: {
-                            color: '#2d3748',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#9ca3af',
-                            font: {
-                                family: 'JetBrains Mono'
-                            }
-                        }
+                        grid: { color: '#2d3748', drawBorder: false },
+                        ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono' } }
                     }
                 }
             };
 
-            // Traffic Chart
             const trafficCtx = document.getElementById('trafficChart').getContext('2d');
             trafficChart = new Chart(trafficCtx, {
                 type: 'line',
@@ -866,7 +774,6 @@
                 options: chartDefaults
             });
 
-            // Sources Chart (Doughnut)
             const sourcesCtx = document.getElementById('sourcesChart').getContext('2d');
             sourcesChart = new Chart(sourcesCtx, {
                 type: 'doughnut',
@@ -894,10 +801,7 @@
                             position: 'right',
                             labels: {
                                 color: '#e5e7eb',
-                                font: {
-                                    family: 'Outfit',
-                                    size: 12
-                                },
+                                font: { family: 'Outfit', size: 12 },
                                 padding: 15
                             }
                         }
@@ -911,27 +815,22 @@
         // ==========================================
 
         function updateMetrics(gaData, jetpackData) {
-            // Visitors
             document.getElementById('totalVisitors').textContent = 
-                (gaData.totalVisitors || jetpackData.visitors || 0).toLocaleString();
-
-            // Page Views
+                (gaData.totalVisitors || 0).toLocaleString();
             document.getElementById('pageViews').textContent = 
-                (gaData.totalPageViews || jetpackData.views || 0).toLocaleString();
-
-            // Bounce Rate
+                (gaData.totalPageViews || 0).toLocaleString();
+            
             const bounceRate = gaData.avgBounceRate || 0;
             document.getElementById('bounceRate').textContent = bounceRate.toFixed(1) + '%';
-
-            // Session Duration
+            
             const duration = gaData.avgSessionDuration || 0;
             const minutes = Math.floor(duration / 60);
             const seconds = Math.floor(duration % 60);
-            document.getElementById('sessionDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('sessionDuration').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
         function updateCharts(gaData) {
-            // Update traffic chart
             const dates = Object.keys(gaData.dailyData).sort();
             const visitors = dates.map(date => gaData.dailyData[date].visitors);
             const views = dates.map(date => gaData.dailyData[date].views);
@@ -944,7 +843,6 @@
             trafficChart.data.datasets[1].data = views;
             trafficChart.update();
 
-            // Update sources chart
             const sources = Object.keys(gaData.sources);
             const sourceValues = sources.map(s => gaData.sources[s]);
 
@@ -953,10 +851,8 @@
             sourcesChart.update();
         }
 
-        function updateTable(gaData, jetpackData) {
+        function updateTable(gaData) {
             const tbody = document.getElementById('tableBody');
-            
-            // Combine top pages from both sources
             const pages = Object.entries(gaData.topPages)
                 .sort((a, b) => b[1].views - a[1].views)
                 .slice(0, 10);
@@ -991,8 +887,8 @@
         async function refreshData() {
             const config = loadConfig();
             
-            if (!config || !config.gaPropertyId || !config.jetpackSiteId) {
-                showAlert('Please configure your API credentials first', 'error');
+            if (!config || !config.backendUrl || !config.gaPropertyId || !config.jetpackSiteId) {
+                showAlert('Please configure all settings first', 'error');
                 return;
             }
 
@@ -1003,7 +899,6 @@
             btn.disabled = true;
 
             try {
-                // Fetch data from both APIs
                 const [gaData, jetpackData] = await Promise.all([
                     fetchGoogleAnalytics(config),
                     fetchJetpackStats(config)
@@ -1011,7 +906,7 @@
                 
                 updateMetrics(gaData, jetpackData);
                 updateCharts(gaData);
-                updateTable(gaData, jetpackData);
+                updateTable(gaData);
                 
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
                 showAlert('Data refreshed successfully!', 'success');
@@ -1031,16 +926,8 @@
         function init() {
             initCharts();
             loadConfig();
-            
-            // Check if config exists and auto-load data
-            const config = loadConfig();
-            if (config && config.gaPropertyId && config.jetpackSiteId) {
-                showAlert('Loading data from saved configuration...', 'info');
-                setTimeout(() => refreshData(), 500);
-            }
         }
 
-        // Initialize dashboard when page loads
         window.addEventListener('load', init);
     </script>
 </body>
