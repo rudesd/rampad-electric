@@ -671,11 +671,21 @@
                 trafficChart.update();
             }
 
-            // Referrers chart
-            const referrers = (data.top_referrers || []).slice(0, 10);
+            // Referrers chart - handle the nested structure
+            let referrers = [];
+            if (data.top_referrers) {
+                // Get the latest date's data
+                const dates = Object.keys(data.top_referrers);
+                if (dates.length > 0) {
+                    const latestDate = dates[dates.length - 1];
+                    referrers = data.top_referrers[latestDate]?.groups || [];
+                }
+            }
+            
             if (referrers.length > 0) {
-                const labels = referrers.map(r => r.group || r.name || 'Direct');
-                const values = referrers.map(r => r.views || 0);
+                const topReferrers = referrers.slice(0, 10);
+                const labels = topReferrers.map(r => r.group || r.name || 'Direct');
+                const values = topReferrers.map(r => r.views || 0);
                 
                 referrersChart.data.labels = labels;
                 referrersChart.data.datasets[0].data = values;
@@ -685,20 +695,31 @@
 
         function updateTables(data) {
             const pagesBody = document.getElementById('pagesBody');
-            const topPosts = (data.top_posts || []).slice(0, 10);
+            
+            // Handle the nested structure
+            let topPosts = [];
+            if (data.top_posts) {
+                // Get the latest date's data
+                const dates = Object.keys(data.top_posts);
+                if (dates.length > 0) {
+                    const latestDate = dates[dates.length - 1];
+                    topPosts = data.top_posts[latestDate]?.postviews || [];
+                }
+            }
 
             if (topPosts.length === 0) {
                 pagesBody.innerHTML = `
                     <tr>
                         <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                            No data available
+                            No data available yet - check back after the site gets more traffic
                         </td>
                     </tr>
                 `;
                 return;
             }
 
-            pagesBody.innerHTML = topPosts.map(post => `
+            const displayPosts = topPosts.slice(0, 10);
+            pagesBody.innerHTML = displayPosts.map(post => `
                 <tr>
                     <td><strong>${post.title || post.href || 'Unknown'}</strong></td>
                     <td>${(post.views || 0).toLocaleString()}</td>
