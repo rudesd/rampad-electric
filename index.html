@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard - Rampad Electric</title>
+    <title>Rampad Electric - Analytics & Call Logs</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
         .dashboard {
             min-height: 100vh;
             padding: 2rem;
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
             animation: fadeIn 0.6s ease-out;
         }
@@ -55,12 +55,6 @@
             margin-bottom: 3rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid var(--border);
-            animation: slideDown 0.7s ease-out 0.1s both;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
@@ -83,37 +77,6 @@
             align-items: center;
             margin-top: 0.5rem;
             flex-wrap: wrap;
-        }
-
-        .time-period-tabs {
-            display: flex;
-            gap: 0.5rem;
-            background: var(--bg-secondary);
-            padding: 0.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-        }
-
-        .time-tab {
-            padding: 0.5rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .time-tab:hover {
-            color: var(--accent-primary);
-        }
-
-        .time-tab.active {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
         }
 
         .refresh-btn {
@@ -144,199 +107,6 @@
             cursor: not-allowed;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            animation: scaleIn 0.5s ease-out both;
-        }
-
-        .stat-card:nth-child(1) { animation-delay: 0.2s; }
-        .stat-card:nth-child(2) { animation-delay: 0.25s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px var(--shadow);
-            border-color: var(--accent-primary);
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-change {
-            font-size: 0.875rem;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-secondary);
-        }
-
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            animation: fadeInUp 0.6s ease-out both;
-        }
-
-        .chart-card.hidden {
-            display: none;
-        }
-
-        .chart-card:nth-child(1) { animation-delay: 0.4s; }
-        .chart-card:nth-child(2) { animation-delay: 0.5s; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .chart-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .chart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .chart-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        .table-section {
-            animation: fadeInUp 0.6s ease-out 0.6s both;
-        }
-
-        .table-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            overflow-x: auto;
-        }
-
-        .table-card.hidden {
-            display: none;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: var(--bg-secondary);
-        }
-
-        th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-            border-bottom: 2px solid var(--border);
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9375rem;
-        }
-
-        tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background: var(--bg-secondary);
-        }
-
         .loading-spinner {
             display: none;
             width: 20px;
@@ -364,11 +134,22 @@
             color: var(--accent-primary);
         }
 
+        .config-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .config-section-title {
+            font-size: 0.875rem;
+            color: var(--accent-primary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         .config-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1rem;
-            margin-bottom: 1rem;
         }
 
         .config-field {
@@ -441,6 +222,198 @@
             color: var(--accent-success);
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px var(--shadow);
+            border-color: var(--accent-primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-secondary);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .call-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .call-status.completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        .call-status.missed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .call-status.ongoing {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-warning);
+            border: 1px solid var(--accent-warning);
+        }
+
+        .play-btn {
+            background: var(--accent-primary);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .play-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
         @media (max-width: 768px) {
             .dashboard {
                 padding: 1rem;
@@ -454,22 +427,16 @@
                 grid-template-columns: 1fr;
             }
 
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
-
-            .header-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
             .config-grid {
                 grid-template-columns: 1fr;
             }
 
-            .time-period-tabs {
-                flex-wrap: wrap;
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
             }
         }
     </style>
@@ -477,12 +444,12 @@
 <body>
     <div class="dashboard">
         <header>
-            <h1>Rampad Electric Analytics</h1>
+            <h1>Rampad Electric Dashboard</h1>
             <div class="header-meta">
                 <span>Last updated: <strong id="lastUpdated">Not yet loaded</strong></span>
-                <button class="refresh-btn" onclick="refreshData()">
+                <button class="refresh-btn" onclick="refreshAll()">
                     <div class="loading-spinner" id="loadingSpinner"></div>
-                    <span>Refresh Data</span>
+                    <span>Refresh All</span>
                 </button>
             </div>
         </header>
@@ -491,106 +458,100 @@
         <div class="config-panel">
             <h3>🔑 Configuration</h3>
             <div id="configAlert" class="alert"></div>
-            <div class="config-grid">
-                <div class="config-field">
-                    <label for="backendUrl">Backend Server URL</label>
-                    <input type="text" id="backendUrl" placeholder="https://your-backend.railway.app" value="https://analytics-backend-production-e34a.up.railway.app">
-                </div>
-                <div class="config-field">
-                    <label for="jetpackSiteId">Jetpack Site ID</label>
-                    <input type="text" id="jetpackSiteId" placeholder="yourdomain.com" value="rampadelectric.com">
-                </div>
-                <div class="config-field">
-                    <label for="jetpackToken">Jetpack Access Token</label>
-                    <input type="password" id="jetpackToken" placeholder="Your Jetpack Token">
+            
+            <div class="config-section">
+                <div class="config-section-title">📊 Website Analytics</div>
+                <div class="config-grid">
+                    <div class="config-field">
+                        <label for="backendUrl">Backend Server URL</label>
+                        <input type="text" id="backendUrl" value="https://analytics-backend-production-e34a.up.railway.app">
+                    </div>
+                    <div class="config-field">
+                        <label for="jetpackSiteId">Jetpack Site ID</label>
+                        <input type="text" id="jetpackSiteId" value="rampadelectric.com">
+                    </div>
+                    <div class="config-field">
+                        <label for="jetpackToken">Jetpack Token</label>
+                        <input type="password" id="jetpackToken">
+                    </div>
                 </div>
             </div>
+
+            <div class="config-section">
+                <div class="config-section-title">📞 Twilio Call Tracking</div>
+                <div class="config-grid">
+                    <div class="config-field">
+                        <label for="twilioAccountSid">Twilio Account SID</label>
+                        <input type="text" id="twilioAccountSid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                    </div>
+                    <div class="config-field">
+                        <label for="twilioAuthToken">Twilio Auth Token</label>
+                        <input type="password" id="twilioAuthToken">
+                    </div>
+                </div>
+            </div>
+
             <button class="save-config-btn" onclick="saveConfig()">Save Configuration</button>
         </div>
 
-        <!-- Time Period Tabs -->
-        <div class="time-period-tabs">
-            <button class="time-tab" onclick="changePeriod('day')" data-period="day">Today</button>
-            <button class="time-tab active" onclick="changePeriod('week')" data-period="week">7 Days</button>
-            <button class="time-tab" onclick="changePeriod('month')" data-period="month">30 Days</button>
-        </div>
-
-        <!-- Key Metrics Cards -->
+        <!-- Key Metrics -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Views</div>
+                <div class="stat-label">Website Views</div>
                 <div class="stat-value" id="totalViews">-</div>
-                <div class="stat-change" id="viewsChange">Loading...</div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-label">Visitors</div>
                 <div class="stat-value" id="totalVisitors">-</div>
-                <div class="stat-change" id="visitorsChange">Loading...</div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-label">Today's Views</div>
-                <div class="stat-value" id="todayViews">-</div>
-                <div class="stat-change" id="todayChange">So far today</div>
+                <div class="stat-label">Total Calls</div>
+                <div class="stat-value" id="totalCalls">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Calls</div>
+                <div class="stat-value" id="todayCalls">-</div>
             </div>
         </div>
 
-        <!-- Charts -->
-        <div class="charts-section">
-            <div class="chart-card" id="trafficChartCard">
-                <div class="chart-header">
-                    <h3 class="chart-title">Traffic Overview</h3>
-                    <p class="chart-subtitle" id="trafficSubtitle">Last 7 days</p>
-                </div>
-                <canvas id="trafficChart"></canvas>
+        <!-- Traffic Chart -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">Website Traffic</h3>
+                <p class="chart-subtitle">Last 30 days</p>
             </div>
-
-            <div class="chart-card" id="referrersChartCard">
-                <div class="chart-header">
-                    <h3 class="chart-title">Top Referrers</h3>
-                    <p class="chart-subtitle" id="referrersSubtitle">Last 7 days</p>
-                </div>
-                <canvas id="referrersChart"></canvas>
-                <div class="empty-state" id="referrersEmpty" style="display: none;">
-                    <div class="empty-state-icon">📊</div>
-                    <p>No referrer data available yet</p>
-                </div>
-            </div>
+            <canvas id="trafficChart"></canvas>
         </div>
 
-        <!-- Data Tables -->
-        <div class="table-section">
-            <div class="table-card" id="pagesTableCard">
-                <div class="table-header">
-                    <h3 class="table-title">Top Pages</h3>
-                </div>
-                <table id="pagesTable">
-                    <thead>
-                        <tr>
-                            <th>Page</th>
-                            <th>Views</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pagesBody">
-                        <tr>
-                            <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                Configure your settings above and click "Refresh Data"
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="empty-state" id="pagesEmpty" style="display: none;">
-                    <div class="empty-state-icon">📄</div>
-                    <p>No page data available yet</p>
-                </div>
+        <!-- Call Log Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3 class="table-title">📞 Recent Calls</h3>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Caller</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Recording</th>
+                    </tr>
+                </thead>
+                <tbody id="callsBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            Configure Twilio credentials above and click "Refresh All"
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        const CONFIG_KEY = 'jetpack_dashboard_config';
-        let currentPeriod = 'week';
+        const CONFIG_KEY = 'rampad_dashboard_config';
+        let trafficChart;
 
         function loadConfig() {
             const saved = localStorage.getItem(CONFIG_KEY);
@@ -599,6 +560,8 @@
                 document.getElementById('backendUrl').value = config.backendUrl || '';
                 document.getElementById('jetpackSiteId').value = config.jetpackSiteId || '';
                 document.getElementById('jetpackToken').value = config.jetpackToken || '';
+                document.getElementById('twilioAccountSid').value = config.twilioAccountSid || '';
+                document.getElementById('twilioAuthToken').value = config.twilioAuthToken || '';
                 return config;
             }
             return null;
@@ -608,17 +571,14 @@
             const config = {
                 backendUrl: document.getElementById('backendUrl').value,
                 jetpackSiteId: document.getElementById('jetpackSiteId').value,
-                jetpackToken: document.getElementById('jetpackToken').value
+                jetpackToken: document.getElementById('jetpackToken').value,
+                twilioAccountSid: document.getElementById('twilioAccountSid').value,
+                twilioAuthToken: document.getElementById('twilioAuthToken').value
             };
-
-            if (!config.backendUrl || !config.jetpackSiteId || !config.jetpackToken) {
-                showAlert('Please fill in all fields', 'error');
-                return;
-            }
 
             localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
             showAlert('Configuration saved!', 'success');
-            setTimeout(() => refreshData(), 1000);
+            setTimeout(() => refreshAll(), 1000);
         }
 
         function showAlert(message, type) {
@@ -628,68 +588,9 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        function changePeriod(period) {
-            currentPeriod = period;
-            
-            // Update active tab
-            document.querySelectorAll('.time-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`[data-period="${period}"]`).classList.add('active');
-            
-            // Update subtitles
-            const periodText = period === 'day' ? 'Today' : period === 'week' ? 'Last 7 days' : 'Last 30 days';
-            document.getElementById('trafficSubtitle').textContent = periodText;
-            document.getElementById('referrersSubtitle').textContent = periodText;
-            
-            // Refresh data with new period
-            refreshData();
-        }
-
-        async function fetchJetpackStats(config) {
-            const response = await fetch(
-                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}`
-            );
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Jetpack API error');
-            }
-
-            return await response.json();
-        }
-
-        let trafficChart, referrersChart;
-
-        function initCharts() {
-            const chartDefaults = {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#e5e7eb',
-                            font: { family: 'Outfit', size: 12 },
-                            usePointStyle: true,
-                            padding: 20
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { color: '#2d3748', drawBorder: false },
-                        ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono' } }
-                    },
-                    y: {
-                        grid: { color: '#2d3748', drawBorder: false },
-                        ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono' } }
-                    }
-                }
-            };
-
-            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
-            trafficChart = new Chart(trafficCtx, {
+        function initChart() {
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            trafficChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: [],
@@ -703,131 +604,155 @@
                         fill: true
                     }]
                 },
-                options: chartDefaults
-            });
-
-            const referrersCtx = document.getElementById('referrersChart').getContext('2d');
-            referrersChart = new Chart(referrersCtx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Visits',
-                        data: [],
-                        backgroundColor: 'rgba(0, 217, 255, 0.6)',
-                        borderColor: '#00d9ff',
-                        borderWidth: 1
-                    }]
-                },
-                options: chartDefaults
-            });
-        }
-
-        function updateMetrics(data) {
-            const stats = data.stats || {};
-            
-            document.getElementById('totalViews').textContent = 
-                (stats.views || 0).toLocaleString();
-            document.getElementById('totalVisitors').textContent = 
-                (stats.visitors || 0).toLocaleString();
-            document.getElementById('todayViews').textContent = 
-                (stats.views_today || 0).toLocaleString();
-                
-            const periodText = currentPeriod === 'day' ? 'Today' : currentPeriod === 'week' ? 'Last 7 days' : 'Last 30 days';
-            document.getElementById('viewsChange').textContent = periodText;
-            document.getElementById('visitorsChange').textContent = periodText;
-        }
-
-        function updateCharts(data) {
-            // Traffic chart - filter data based on period
-            const visits = data.visits?.data || [];
-            
-            if (visits.length > 0) {
-                let filteredVisits = visits;
-                
-                if (currentPeriod === 'day') {
-                    filteredVisits = visits.slice(-1);
-                } else if (currentPeriod === 'week') {
-                    filteredVisits = visits.slice(-7);
-                } else {
-                    filteredVisits = visits.slice(-30);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 3,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e5e7eb',
+                                font: { family: 'Outfit', size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#2d3748', drawBorder: false },
+                            ticks: { color: '#9ca3af' }
+                        },
+                        y: {
+                            grid: { color: '#2d3748', drawBorder: false },
+                            ticks: { color: '#9ca3af' }
+                        }
+                    }
                 }
-                
-                const labels = filteredVisits.map(v => v[0]);
-                const values = filteredVisits.map(v => v[1]);
-                
+            });
+        }
+
+        async function fetchWebsiteAnalytics(config) {
+            const response = await fetch(
+                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}`
+            );
+            if (!response.ok) throw new Error('Failed to fetch website analytics');
+            return await response.json();
+        }
+
+        async function fetchCallLogs(config) {
+            const response = await fetch(
+                `${config.backendUrl}/api/twilio/calls?accountSid=${config.twilioAccountSid}&authToken=${encodeURIComponent(config.twilioAuthToken)}&pageSize=50`
+            );
+            if (!response.ok) throw new Error('Failed to fetch call logs');
+            return await response.json();
+        }
+
+        function updateWebsiteMetrics(data) {
+            const stats = data.stats || {};
+            document.getElementById('totalViews').textContent = (stats.views || 0).toLocaleString();
+            document.getElementById('totalVisitors').textContent = (stats.visitors || 0).toLocaleString();
+
+            const visits = data.visits?.data || [];
+            if (visits.length > 0) {
+                const labels = visits.map(v => v[0]);
+                const values = visits.map(v => v[1]);
                 trafficChart.data.labels = labels;
                 trafficChart.data.datasets[0].data = values;
                 trafficChart.update();
-                
-                document.getElementById('trafficChartCard').classList.remove('hidden');
-            } else {
-                document.getElementById('trafficChartCard').classList.add('hidden');
-            }
-
-            // Referrers chart
-            let referrers = [];
-            if (data.top_referrers) {
-                const dates = Object.keys(data.top_referrers);
-                if (dates.length > 0) {
-                    const latestDate = dates[dates.length - 1];
-                    referrers = data.top_referrers[latestDate]?.groups || [];
-                }
-            }
-            
-            if (referrers.length > 0) {
-                const topReferrers = referrers.slice(0, 10);
-                const labels = topReferrers.map(r => r.group || r.name || 'Direct');
-                const values = topReferrers.map(r => r.views || 0);
-                
-                referrersChart.data.labels = labels;
-                referrersChart.data.datasets[0].data = values;
-                referrersChart.update();
-                
-                document.getElementById('referrersChart').style.display = 'block';
-                document.getElementById('referrersEmpty').style.display = 'none';
-            } else {
-                document.getElementById('referrersChart').style.display = 'none';
-                document.getElementById('referrersEmpty').style.display = 'block';
             }
         }
 
-        function updateTables(data) {
-            const pagesBody = document.getElementById('pagesBody');
-            const table = document.getElementById('pagesTable');
-            const emptyState = document.getElementById('pagesEmpty');
+        function updateCallMetrics(data) {
+            const calls = data.calls || [];
+            document.getElementById('totalCalls').textContent = calls.length;
             
-            let topPosts = [];
-            if (data.top_posts) {
-                const dates = Object.keys(data.top_posts);
-                if (dates.length > 0) {
-                    const latestDate = dates[dates.length - 1];
-                    topPosts = data.top_posts[latestDate]?.postviews || [];
-                }
-            }
+            const today = new Date().toISOString().split('T')[0];
+            const todayCalls = calls.filter(call => 
+                call.startTime && call.startTime.startsWith(today)
+            ).length;
+            document.getElementById('todayCalls').textContent = todayCalls;
+        }
 
-            if (topPosts.length === 0) {
-                table.style.display = 'none';
-                emptyState.style.display = 'block';
+        function updateCallTable(data, config) {
+            const tbody = document.getElementById('callsBody');
+            const calls = data.calls || [];
+
+            if (calls.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            No calls found
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
-            table.style.display = 'table';
-            emptyState.style.display = 'none';
-            
-            const displayPosts = topPosts.slice(0, 10);
-            pagesBody.innerHTML = displayPosts.map(post => `
-                <tr>
-                    <td><strong>${post.title || post.href || 'Unknown'}</strong></td>
-                    <td>${(post.views || 0).toLocaleString()}</td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = calls.slice(0, 50).map(call => {
+                const date = new Date(call.startTime);
+                const duration = Math.floor(call.duration / 60);
+                const seconds = call.duration % 60;
+                
+                let statusClass = 'completed';
+                let statusText = 'Completed';
+                if (call.status === 'no-answer' || call.status === 'busy') {
+                    statusClass = 'missed';
+                    statusText = 'Missed';
+                } else if (call.status === 'in-progress' || call.status === 'ringing') {
+                    statusClass = 'ongoing';
+                    statusText = 'Ongoing';
+                }
+
+                return `
+                    <tr>
+                        <td>${date.toLocaleString()}</td>
+                        <td><strong>${call.from}</strong></td>
+                        <td>${duration}:${seconds.toString().padStart(2, '0')}</td>
+                        <td><span class="call-status ${statusClass}">${statusText}</span></td>
+                        <td>
+                            ${call.duration > 0 ? `<button class="play-btn" onclick="playRecording('${call.sid}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">▶ Play</button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        async function refreshData() {
+        async function playRecording(callSid, backendUrl, accountSid, authToken) {
+            try {
+                showAlert('Fetching recording...', 'success');
+                
+                const response = await fetch(
+                    `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Recording not found');
+                }
+                
+                const data = await response.json();
+                
+                if (data.recordings && data.recordings.length > 0) {
+                    const recording = data.recordings[0];
+                    const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
+                    
+                    // Create audio player
+                    const audio = new Audio(audioUrl);
+                    audio.controls = true;
+                    audio.play();
+                    
+                    showAlert('Playing recording...', 'success');
+                } else {
+                    showAlert('No recording available for this call', 'error');
+                }
+            } catch (error) {
+                console.error('Error playing recording:', error);
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function refreshAll() {
             const config = loadConfig();
             
-            if (!config || !config.backendUrl || !config.jetpackSiteId || !config.jetpackToken) {
+            if (!config) {
                 showAlert('Please configure your settings first', 'error');
                 return;
             }
@@ -839,11 +764,18 @@
             btn.disabled = true;
 
             try {
-                const data = await fetchJetpackStats(config);
-                
-                updateMetrics(data);
-                updateCharts(data);
-                updateTables(data);
+                // Fetch website analytics if configured
+                if (config.jetpackSiteId && config.jetpackToken) {
+                    const websiteData = await fetchWebsiteAnalytics(config);
+                    updateWebsiteMetrics(websiteData);
+                }
+
+                // Fetch call logs if configured
+                if (config.twilioAccountSid && config.twilioAuthToken) {
+                    const callData = await fetchCallLogs(config);
+                    updateCallMetrics(callData);
+                    updateCallTable(callData, config);
+                }
                 
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
                 showAlert('Data refreshed successfully!', 'success');
@@ -857,7 +789,7 @@
         }
 
         function init() {
-            initCharts();
+            initChart();
             loadConfig();
         }
 
