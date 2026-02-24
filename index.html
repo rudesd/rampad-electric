@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -222,6 +222,28 @@
             color: var(--accent-success);
         }
 
+        .time-tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .time-tab:hover {
+            color: var(--accent-primary);
+        }
+
+        .time-tab.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -397,6 +419,9 @@
             font-size: 0.75rem;
             font-weight: 600;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .play-btn:hover {
@@ -409,9 +434,73 @@
             cursor: not-allowed;
         }
 
-        audio {
-            width: 100%;
+        .audio-player {
+            display: none;
+            background: var(--bg-secondary);
+            padding: 0.75rem;
+            border-radius: 8px;
             margin-top: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .audio-player.active {
+            display: block;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .audio-play-pause {
+            background: var(--accent-primary);
+            border: none;
+            color: var(--bg-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .audio-play-pause:hover {
+            opacity: 0.8;
+        }
+
+        .audio-progress-container {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .audio-progress-bar {
+            height: 100%;
+            background: var(--accent-primary);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .audio-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .audio-loading {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-style: italic;
         }
 
         @media (max-width: 768px) {
@@ -495,6 +584,15 @@
         </div>
 
         <!-- Key Metrics -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 600;">Website Analytics</h2>
+            <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
+                <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
+                <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
+                <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
+            </div>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Website Views</div>
@@ -518,7 +616,7 @@
         <div class="chart-card">
             <div class="chart-header">
                 <h3 class="chart-title">Website Traffic</h3>
-                <p class="chart-subtitle">Last 30 days</p>
+                <p class="chart-subtitle" id="chartSubtitle">Last 7 days</p>
             </div>
             <canvas id="trafficChart"></canvas>
         </div>
@@ -552,6 +650,8 @@
     <script>
         const CONFIG_KEY = 'rampad_dashboard_config';
         let trafficChart;
+        let websitePeriod = 'week'; // Default to 7 days
+        let cachedWebsiteData = null; // Cache data to avoid re-fetching
 
         function loadConfig() {
             const saved = localStorage.getItem(CONFIG_KEY);
@@ -586,6 +686,25 @@
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
             setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        function changeWebsitePeriod(period) {
+            websitePeriod = period;
+            
+            // Update active tab
+            document.querySelectorAll('.time-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+            
+            // Update subtitle
+            const periodText = period === 'week' ? 'Last 7 days' : period === 'month' ? 'Last 30 days' : 'Last 90 days';
+            document.getElementById('chartSubtitle').textContent = periodText;
+            
+            // Re-render with cached data if available
+            if (cachedWebsiteData) {
+                updateWebsiteMetrics(cachedWebsiteData);
+            }
         }
 
         function initChart() {
@@ -647,14 +766,30 @@
         }
 
         function updateWebsiteMetrics(data) {
+            cachedWebsiteData = data; // Cache the data
+            
             const stats = data.stats || {};
+            
+            // Update basic stats (these don't change with period)
             document.getElementById('totalViews').textContent = (stats.views || 0).toLocaleString();
             document.getElementById('totalVisitors').textContent = (stats.visitors || 0).toLocaleString();
 
+            // Filter chart data based on selected period
             const visits = data.visits?.data || [];
             if (visits.length > 0) {
-                const labels = visits.map(v => v[0]);
-                const values = visits.map(v => v[1]);
+                let filteredVisits = visits;
+                
+                if (websitePeriod === 'week') {
+                    filteredVisits = visits.slice(-7); // Last 7 days
+                } else if (websitePeriod === 'month') {
+                    filteredVisits = visits.slice(-30); // Last 30 days
+                } else if (websitePeriod === 'quarter') {
+                    filteredVisits = visits.slice(-90); // Last 90 days
+                }
+                
+                const labels = filteredVisits.map(v => v[0]);
+                const values = filteredVisits.map(v => v[1]);
+                
                 trafficChart.data.labels = labels;
                 trafficChart.data.datasets[0].data = values;
                 trafficChart.update();
@@ -687,7 +822,7 @@
                 return;
             }
 
-            tbody.innerHTML = calls.slice(0, 50).map(call => {
+            tbody.innerHTML = calls.slice(0, 50).map((call, index) => {
                 const date = new Date(call.startTime);
                 const duration = Math.floor(call.duration / 60);
                 const seconds = call.duration % 60;
@@ -709,44 +844,143 @@
                         <td>${duration}:${seconds.toString().padStart(2, '0')}</td>
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
-                            ${call.duration > 0 ? `<button class="play-btn" onclick="playRecording('${call.sid}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">▶ Play</button>` : '-'}
+                            ${call.duration > 0 ? `
+                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">
+                                    <span id="btn-icon-${index}">▶</span> Play
+                                </button>
+                                <div class="audio-player" id="player-${index}">
+                                    <div class="audio-controls">
+                                        <button class="audio-play-pause" onclick="togglePlayPause('player-${index}')" id="playpause-${index}">▶</button>
+                                        <div class="audio-progress-container" onclick="seek(event, 'player-${index}')">
+                                            <div class="audio-progress-bar" id="progress-${index}"></div>
+                                        </div>
+                                        <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
+                                    </div>
+                                    <audio id="audio-${index}" preload="none"></audio>
+                                </div>
+                            ` : '-'}
                         </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        async function playRecording(callSid, backendUrl, accountSid, authToken) {
-            try {
-                showAlert('Fetching recording...', 'success');
-                
-                const response = await fetch(
-                    `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
-                );
-                
-                if (!response.ok) {
-                    throw new Error('Recording not found');
-                }
-                
-                const data = await response.json();
-                
-                if (data.recordings && data.recordings.length > 0) {
-                    const recording = data.recordings[0];
-                    const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
-                    
-                    // Create audio player
-                    const audio = new Audio(audioUrl);
-                    audio.controls = true;
-                    audio.play();
-                    
-                    showAlert('Playing recording...', 'success');
-                } else {
-                    showAlert('No recording available for this call', 'error');
-                }
-            } catch (error) {
-                console.error('Error playing recording:', error);
-                showAlert('Error: ' + error.message, 'error');
+        async function toggleRecording(callSid, playerId, backendUrl, accountSid, authToken) {
+            const player = document.getElementById(playerId);
+            const audio = document.getElementById('audio-' + playerId.split('-')[1]);
+            const btnIcon = document.getElementById('btn-icon-' + playerId.split('-')[1]);
+            
+            // Toggle player visibility
+            if (player.classList.contains('active')) {
+                player.classList.remove('active');
+                audio.pause();
+                audio.src = '';
+                btnIcon.textContent = '▶';
+                return;
             }
+            
+            // Close other players
+            document.querySelectorAll('.audio-player').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('[id^="btn-icon-"]').forEach(icon => icon.textContent = '▶');
+            
+            // Show player and load recording
+            player.classList.add('active');
+            btnIcon.textContent = '⏸';
+            
+            // Only fetch recording when user clicks play (lazy loading)
+            if (!audio.src) {
+                try {
+                    const response = await fetch(
+                        `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
+                    );
+                    
+                    if (!response.ok) {
+                        throw new Error('Recording not found');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.recordings && data.recordings.length > 0) {
+                        const recording = data.recordings[0];
+                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
+                        
+                        audio.src = audioUrl;
+                        setupAudioEvents(audio, playerId);
+                        audio.play();
+                    } else {
+                        showAlert('No recording available for this call', 'error');
+                        player.classList.remove('active');
+                    }
+                } catch (error) {
+                    console.error('Error loading recording:', error);
+                    showAlert('Error: ' + error.message, 'error');
+                    player.classList.remove('active');
+                }
+            } else {
+                audio.play();
+            }
+        }
+
+        function setupAudioEvents(audio, playerId) {
+            const playerNum = playerId.split('-')[1];
+            const playPauseBtn = document.getElementById('playpause-' + playerNum);
+            const progressBar = document.getElementById('progress-' + playerNum);
+            const timeDisplay = document.getElementById('time-' + playerNum);
+            
+            audio.addEventListener('loadedmetadata', () => {
+                updateTimeDisplay(audio, timeDisplay);
+            });
+            
+            audio.addEventListener('timeupdate', () => {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = progress + '%';
+                updateTimeDisplay(audio, timeDisplay);
+            });
+            
+            audio.addEventListener('play', () => {
+                playPauseBtn.textContent = '⏸';
+            });
+            
+            audio.addEventListener('pause', () => {
+                playPauseBtn.textContent = '▶';
+            });
+            
+            audio.addEventListener('ended', () => {
+                playPauseBtn.textContent = '▶';
+                progressBar.style.width = '0%';
+            });
+        }
+
+        function togglePlayPause(playerId) {
+            const playerNum = playerId.split('-')[1];
+            const audio = document.getElementById('audio-' + playerNum);
+            
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        function seek(event, playerId) {
+            const playerNum = playerId.split('-')[1];
+            const audio = document.getElementById('audio-' + playerNum);
+            const progressContainer = event.currentTarget;
+            const clickPosition = event.offsetX / progressContainer.offsetWidth;
+            audio.currentTime = clickPosition * audio.duration;
+        }
+
+        function updateTimeDisplay(audio, timeDisplay) {
+            const current = formatTime(audio.currentTime);
+            const duration = formatTime(audio.duration);
+            timeDisplay.textContent = `${current} / ${duration}`;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
         async function refreshAll() {
