@@ -923,9 +923,9 @@
                            '12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
 
             const bestDay = insights.highest_day_of_week != null ? days[insights.highest_day_of_week] : null;
-            const bestDayPct = insights.highest_day_percent != null ? Math.round(insights.highest_day_percent * 100) : null;
+            const bestDayPct = insights.highest_day_percent != null ? Math.round(insights.highest_day_percent) : null;
             const bestHour = insights.highest_hour != null ? hours[insights.highest_hour] : null;
-            const bestHourPct = insights.highest_hour_percent != null ? Math.round(insights.highest_hour_percent * 100) : null;
+            const bestHourPct = insights.highest_hour_percent != null ? Math.round(insights.highest_hour_percent) : null;
 
             if (!bestDay && !bestHour) {
                 el.innerHTML = '<p class="no-data">No data available</p>';
