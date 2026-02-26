@@ -127,6 +127,22 @@
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2rem;
+            display: none;
+        }
+
+        .gear-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            padding: 0.25rem 0.5rem;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+
+        .gear-btn:hover {
+            opacity: 1;
         }
 
         .config-panel h3 {
@@ -540,6 +556,7 @@
                     <div class="loading-spinner" id="loadingSpinner"></div>
                     <span>Refresh All</span>
                 </button>
+                <button class="gear-btn" onclick="document.querySelector('.config-panel').style.display = document.querySelector('.config-panel').style.display === 'none' ? 'block' : 'none'" title="Settings">⚙️</button>
             </div>
         </header>
 
