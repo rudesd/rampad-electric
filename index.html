@@ -877,8 +877,8 @@
                                         </div>
                                         <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
                                         <button class="speed-btn active" id="speed-${index}-1" onclick="setSpeed('player-${index}', 1)">1x</button>
+                                        <button class="speed-btn" id="speed-${index}-15" onclick="setSpeed('player-${index}', 1.5)">1.5x</button>
                                         <button class="speed-btn" id="speed-${index}-2" onclick="setSpeed('player-${index}', 2)">2x</button>
-                                        <button class="speed-btn" id="speed-${index}-3" onclick="setSpeed('player-${index}', 3)">3x</button>
                                     </div>
                                     <audio id="audio-${index}" preload="none"></audio>
                                 </div>
@@ -943,7 +943,14 @@
                         const recording = data.recordings[0];
                         const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?client=rampad`;
 
-                        audio.src = audioUrl;
+                        const playerNum = playerId.split('-')[1];
+                        const timeDisplay = document.getElementById('time-' + playerNum);
+                        timeDisplay.textContent = 'Loading...';
+
+                        const streamRes = await fetch(audioUrl);
+                        if (!streamRes.ok) throw new Error('Failed to load audio');
+                        const blob = await streamRes.blob();
+                        audio.src = URL.createObjectURL(blob);
                         setupAudioEvents(audio, playerId);
                         audio.play();
                     } else {
@@ -1016,9 +1023,10 @@
             const playerNum = playerId.split('-')[1];
             const audio = document.getElementById('audio-' + playerNum);
             audio.playbackRate = speed;
-            [1, 2, 3].forEach(s => {
-                const btn = document.getElementById(`speed-${playerNum}-${s}`);
-                if (btn) btn.classList.toggle('active', s === speed);
+            const map = { 1: '1', 1.5: '15', 2: '2' };
+            Object.keys(map).forEach(s => {
+                const btn = document.getElementById(`speed-${playerNum}-${map[s]}`);
+                if (btn) btn.classList.toggle('active', parseFloat(s) === speed);
             });
         }
 
