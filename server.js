@@ -198,22 +198,36 @@ app.get('/api/client/:clientId/analytics', async (req, res) => {
 // TWILIO ENDPOINTS
 // ==========================================
 
-app.get('/api/twilio/calls', async (req, res) => {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-    if (!accountSid || !authToken) {
-        return res.status(500).json({ error: 'Twilio credentials not configured on server' });
+const TWILIO_CREDENTIALS = {
+    rampad: {
+        accountSid: process.env.RAMPAD_TWILIO_ACCOUNT_SID,
+        authToken: process.env.RAMPAD_TWILIO_AUTH_TOKEN
+    },
+    jtbros: {
+        accountSid: process.env.JTBROS_TWILIO_ACCOUNT_SID,
+        authToken: process.env.JTBROS_TWILIO_AUTH_TOKEN
     }
+};
 
-    const { pageSize = 50 } = req.query;
+function getTwilioCredentials(client) {
+    const creds = TWILIO_CREDENTIALS[client];
+    if (!creds || !creds.accountSid || !creds.authToken) return null;
+    return creds;
+}
+
+app.get('/api/twilio/calls', async (req, res) => {
+    const { pageSize = 50, client } = req.query;
+
+    if (!client) return res.status(400).json({ error: 'Missing client parameter' });
+    const creds = getTwilioCredentials(client);
+    if (!creds) return res.status(500).json({ error: `Twilio credentials not configured for: ${client}` });
 
     try {
         const response = await fetch(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json?PageSize=${pageSize}`,
+            `https://api.twilio.com/2010-04-01/Accounts/${creds.accountSid}/Calls.json?PageSize=${pageSize}`,
             {
                 headers: {
-                    'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+                    'Authorization': 'Basic ' + Buffer.from(`${creds.accountSid}:${creds.authToken}`).toString('base64')
                 }
             }
         );
@@ -231,21 +245,20 @@ app.get('/api/twilio/calls', async (req, res) => {
 });
 
 app.get('/api/twilio/recordings/:callSid', async (req, res) => {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const { client } = req.query;
 
-    if (!accountSid || !authToken) {
-        return res.status(500).json({ error: 'Twilio credentials not configured on server' });
-    }
+    if (!client) return res.status(400).json({ error: 'Missing client parameter' });
+    const creds = getTwilioCredentials(client);
+    if (!creds) return res.status(500).json({ error: `Twilio credentials not configured for: ${client}` });
 
     const { callSid } = req.params;
 
     try {
         const response = await fetch(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls/${callSid}/Recordings.json`,
+            `https://api.twilio.com/2010-04-01/Accounts/${creds.accountSid}/Calls/${callSid}/Recordings.json`,
             {
                 headers: {
-                    'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+                    'Authorization': 'Basic ' + Buffer.from(`${creds.accountSid}:${creds.authToken}`).toString('base64')
                 }
             }
         );
@@ -263,21 +276,20 @@ app.get('/api/twilio/recordings/:callSid', async (req, res) => {
 });
 
 app.get('/api/twilio/recording-stream/:recordingSid', async (req, res) => {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const { client } = req.query;
 
-    if (!accountSid || !authToken) {
-        return res.status(500).json({ error: 'Twilio credentials not configured on server' });
-    }
+    if (!client) return res.status(400).json({ error: 'Missing client parameter' });
+    const creds = getTwilioCredentials(client);
+    if (!creds) return res.status(500).json({ error: `Twilio credentials not configured for: ${client}` });
 
     const { recordingSid } = req.params;
 
     try {
         const response = await fetch(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}.mp3`,
+            `https://api.twilio.com/2010-04-01/Accounts/${creds.accountSid}/Recordings/${recordingSid}.mp3`,
             {
                 headers: {
-                    'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+                    'Authorization': 'Basic ' + Buffer.from(`${creds.accountSid}:${creds.authToken}`).toString('base64')
                 }
             }
         );

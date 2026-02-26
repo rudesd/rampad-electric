@@ -486,7 +486,7 @@
 
         async function fetchCallLogs(config) {
             const response = await fetch(
-                `${config.backendUrl}/api/twilio/calls?pageSize=50`
+                `${config.backendUrl}/api/twilio/calls?pageSize=50&client=jtbros`
             );
             if (!response.ok) throw new Error('Failed to fetch call logs');
             return await response.json();
@@ -591,7 +591,7 @@
             if (!audio.src) {
                 try {
                     const response = await fetch(
-                        `${backendUrl}/api/twilio/recordings/${callSid}`
+                        `${backendUrl}/api/twilio/recordings/${callSid}?client=jtbros`
                     );
 
                     if (!response.ok) throw new Error('Recording not found');
@@ -600,7 +600,7 @@
 
                     if (data.recordings && data.recordings.length > 0) {
                         const recording = data.recordings[0];
-                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}`;
+                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?client=jtbros`;
 
                         audio.src = audioUrl;
                         setupAudioEvents(audio, playerId);
