@@ -503,6 +503,26 @@
             border-radius: 3px;
             width: 0%;
             transition: width 0.1s;
+            pointer-events: none;
+        }
+
+        .speed-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+        }
+
+        .speed-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
         }
 
         .audio-time {
@@ -856,6 +876,9 @@
                                             <div class="audio-progress-bar" id="progress-${index}"></div>
                                         </div>
                                         <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
+                                        <button class="speed-btn active" id="speed-${index}-1" onclick="setSpeed('player-${index}', 1)">1x</button>
+                                        <button class="speed-btn" id="speed-${index}-2" onclick="setSpeed('player-${index}', 2)">2x</button>
+                                        <button class="speed-btn" id="speed-${index}-3" onclick="setSpeed('player-${index}', 3)">3x</button>
                                     </div>
                                     <audio id="audio-${index}" preload="none"></audio>
                                 </div>
@@ -982,8 +1005,21 @@
             const playerNum = playerId.split('-')[1];
             const audio = document.getElementById('audio-' + playerNum);
             const progressContainer = event.currentTarget;
-            const clickPosition = event.offsetX / progressContainer.offsetWidth;
-            audio.currentTime = clickPosition * audio.duration;
+            const rect = progressContainer.getBoundingClientRect();
+            const clickPosition = (event.clientX - rect.left) / rect.width;
+            if (audio.duration && !isNaN(audio.duration)) {
+                audio.currentTime = Math.max(0, Math.min(1, clickPosition)) * audio.duration;
+            }
+        }
+
+        function setSpeed(playerId, speed) {
+            const playerNum = playerId.split('-')[1];
+            const audio = document.getElementById('audio-' + playerNum);
+            audio.playbackRate = speed;
+            [1, 2, 3].forEach(s => {
+                const btn = document.getElementById(`speed-${playerNum}-${s}`);
+                if (btn) btn.classList.toggle('active', s === speed);
+            });
         }
 
         function updateTimeDisplay(audio, timeDisplay) {
