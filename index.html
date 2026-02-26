@@ -536,6 +536,70 @@
             text-align: right;
         }
 
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .list-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .list-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+
+        .list-row:last-child {
+            border-bottom: none;
+        }
+
+        .list-label {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 75%;
+        }
+
+        .list-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+        }
+
+        .no-data {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .two-col-grid { grid-template-columns: 1fr; }
+        }
+
         .audio-loading {
             font-size: 0.75rem;
             color: var(--text-secondary);
@@ -642,6 +706,18 @@
                 </div>
             </div>
             <canvas id="trafficChart"></canvas>
+        </div>
+
+        <!-- Most Viewed & Referrers -->
+        <div class="two-col-grid">
+            <div class="list-card">
+                <div class="list-card-title">Most Viewed</div>
+                <div id="topPostsList"><p class="no-data">Loading...</p></div>
+            </div>
+            <div class="list-card">
+                <div class="list-card-title">Referrers</div>
+                <div id="referrersList"><p class="no-data">Loading...</p></div>
+            </div>
         </div>
 
         <!-- Call Log Table -->
@@ -783,34 +859,64 @@
         }
 
         function updateWebsiteMetrics(data) {
-            cachedWebsiteData = data; // Cache the data
-            
-            const stats = data.stats || {};
-            
-            // Update basic stats (these don't change with period)
-            document.getElementById('totalViews').textContent = (stats.views || 0).toLocaleString();
-            document.getElementById('totalVisitors').textContent = (stats.visitors || 0).toLocaleString();
+            cachedWebsiteData = data;
 
             // Filter chart data based on selected period
             const visits = data.visits?.data || [];
-            if (visits.length > 0) {
-                let filteredVisits = visits;
-                
-                if (websitePeriod === 'week') {
-                    filteredVisits = visits.slice(-7); // Last 7 days
-                } else if (websitePeriod === 'month') {
-                    filteredVisits = visits.slice(-30); // Last 30 days
-                } else if (websitePeriod === 'quarter') {
-                    filteredVisits = visits.slice(-90); // Last 90 days
-                }
-                
+            const fields = data.visits?.fields || [];
+            const viewsIdx = fields.indexOf('views') >= 0 ? fields.indexOf('views') : 2;
+            const visitorsIdx = fields.indexOf('visitors') >= 0 ? fields.indexOf('visitors') : 1;
+
+            let filteredVisits = visits;
+            if (websitePeriod === 'week') {
+                filteredVisits = visits.slice(-7);
+            } else if (websitePeriod === 'month') {
+                filteredVisits = visits.slice(-30);
+            } else if (websitePeriod === 'quarter') {
+                filteredVisits = visits.slice(-90);
+            }
+
+            // Stat cards reflect selected period
+            const periodViews = filteredVisits.reduce((sum, v) => sum + (v[viewsIdx] || 0), 0);
+            const periodVisitors = filteredVisits.reduce((sum, v) => sum + (v[visitorsIdx] || 0), 0);
+            document.getElementById('totalViews').textContent = periodViews.toLocaleString();
+            document.getElementById('totalVisitors').textContent = periodVisitors.toLocaleString();
+
+            if (filteredVisits.length > 0) {
                 const labels = filteredVisits.map(v => v[0]);
-                const values = filteredVisits.map(v => v[1]);
-                
+                const values = filteredVisits.map(v => v[viewsIdx] || v[1]);
                 trafficChart.data.labels = labels;
                 trafficChart.data.datasets[0].data = values;
                 trafficChart.update();
             }
+
+            // Top posts
+            renderTopPosts(data.topPosts || []);
+
+            // Referrers
+            renderReferrers(data.referrers || []);
+        }
+
+        function renderTopPosts(posts) {
+            const el = document.getElementById('topPostsList');
+            if (!posts.length) { el.innerHTML = '<p class="no-data">No data available</p>'; return; }
+            el.innerHTML = posts.slice(0, 8).map(p => `
+                <div class="list-row">
+                    <span class="list-label" title="${p.title}">${p.title || 'Home'}</span>
+                    <span class="list-value">${(p.views || 0).toLocaleString()}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderReferrers(groups) {
+            const el = document.getElementById('referrersList');
+            if (!groups.length) { el.innerHTML = '<p class="no-data">No data available</p>'; return; }
+            el.innerHTML = groups.slice(0, 8).map(g => `
+                <div class="list-row">
+                    <span class="list-label" title="${g.name}">${g.name}</span>
+                    <span class="list-value">${(g.views || 0).toLocaleString()}</span>
+                </div>
+            `).join('');
         }
 
         function updateCallMetrics(data) {
