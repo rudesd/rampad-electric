@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Tracking Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141824;
+            --bg-card: #1a1f2e;
+            --accent-primary: #00d9ff;
+            --accent-secondary: #7c3aed;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border: #2d3748;
+            --shadow: rgba(0, 217, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            min-height: 100vh;
+            padding: 2rem;
+            max-width: 1800px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-meta {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .refresh-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn:hover:not(:disabled) {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px var(--shadow);
+            border-color: var(--accent-primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-secondary);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .call-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .call-status.completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        .call-status.missed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .call-status.ongoing {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-warning);
+            border: 1px solid var(--accent-warning);
+        }
+
+        .play-btn {
+            background: var(--accent-primary);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .play-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .audio-player {
+            display: none;
+            background: var(--bg-secondary);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .audio-player.active {
+            display: block;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .audio-play-pause {
+            background: var(--accent-primary);
+            border: none;
+            color: var(--bg-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .audio-play-pause:hover {
+            opacity: 0.8;
+        }
+
+        .audio-progress-container {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .audio-progress-bar {
+            height: 100%;
+            background: var(--accent-primary);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .audio-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            max-width: 400px;
+            z-index: 1000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.95);
+            border: 1px solid var(--accent-danger);
+            color: white;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.95);
+            border: 1px solid var(--accent-success);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .alert {
+                right: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>Call Tracking Dashboard</h1>
+            <div class="header-meta">
+                <span>Last updated: <strong id="lastUpdated">Loading...</strong></span>
+                <button class="refresh-btn" onclick="refreshAll()">
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                    <span>Refresh Data</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Key Metrics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Calls</div>
+                <div class="stat-value" id="totalCalls">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Calls</div>
+                <div class="stat-value" id="todayCalls">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completed</div>
+                <div class="stat-value" id="completedCalls">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Missed</div>
+                <div class="stat-value" id="missedCalls">-</div>
+            </div>
+        </div>
+
+        <!-- Call Log Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3 class="table-title">📞 Recent Calls</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Caller</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Recording</th>
+                    </tr>
+                </thead>
+                <tbody id="callsBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            Loading call data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <script>
+        // ============================================
+        // PRE-CONFIGURED CREDENTIALS
+        // ============================================
+        const CONFIG = {
+            backendUrl: 'https://analytics-backend-production-e34a.up.railway.app',
+            twilioAccountSid: 'ACd6b6de90ab8410b8bd9688fa99f49034',
+            twilioAuthToken: '2ab7ab96a8c6e773b93397d1acd0d83c'
+        };
+        // ============================================
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        async function fetchCallLogs(config) {
+            const response = await fetch(
+                `${config.backendUrl}/api/twilio/calls?accountSid=${config.twilioAccountSid}&authToken=${encodeURIComponent(config.twilioAuthToken)}&pageSize=50`
+            );
+            if (!response.ok) throw new Error('Failed to fetch call logs');
+            return await response.json();
+        }
+
+        function updateCallMetrics(data) {
+            const calls = data.calls || [];
+            document.getElementById('totalCalls').textContent = calls.length;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const todayCalls = calls.filter(call => 
+                call.startTime && call.startTime.startsWith(today)
+            ).length;
+            document.getElementById('todayCalls').textContent = todayCalls;
+
+            const completed = calls.filter(call => call.status === 'completed').length;
+            document.getElementById('completedCalls').textContent = completed;
+
+            const missed = calls.filter(call => 
+                call.status === 'no-answer' || call.status === 'busy'
+            ).length;
+            document.getElementById('missedCalls').textContent = missed;
+        }
+
+        function updateCallTable(data, config) {
+            const tbody = document.getElementById('callsBody');
+            const calls = data.calls || [];
+
+            if (calls.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            No calls found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = calls.slice(0, 50).map((call, index) => {
+                const date = new Date(call.startTime);
+                const duration = Math.floor(call.duration / 60);
+                const seconds = call.duration % 60;
+                
+                let statusClass = 'completed';
+                let statusText = 'Completed';
+                if (call.status === 'no-answer' || call.status === 'busy') {
+                    statusClass = 'missed';
+                    statusText = 'Missed';
+                } else if (call.status === 'in-progress' || call.status === 'ringing') {
+                    statusClass = 'ongoing';
+                    statusText = 'Ongoing';
+                }
+
+                return `
+                    <tr>
+                        <td>${date.toLocaleString()}</td>
+                        <td><strong>${call.from}</strong></td>
+                        <td>${duration}:${seconds.toString().padStart(2, '0')}</td>
+                        <td><span class="call-status ${statusClass}">${statusText}</span></td>
+                        <td>
+                            ${call.duration > 0 ? `
+                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">
+                                    <span id="btn-icon-${index}">▶</span> Play
+                                </button>
+                                <div class="audio-player" id="player-${index}">
+                                    <div class="audio-controls">
+                                        <button class="audio-play-pause" onclick="togglePlayPause('player-${index}')" id="playpause-${index}">▶</button>
+                                        <div class="audio-progress-container" onclick="seek(event, 'player-${index}')">
+                                            <div class="audio-progress-bar" id="progress-${index}"></div>
+                                        </div>
+                                        <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
+                                    </div>
+                                    <audio id="audio-${index}" preload="none"></audio>
+                                </div>
+                            ` : '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function toggleRecording(callSid, playerId, backendUrl, accountSid, authToken) {
+            const player = document.getElementById(playerId);
+            const audio = document.getElementById('audio-' + playerId.split('-')[1]);
+            const btnIcon = document.getElementById('btn-icon-' + playerId.split('-')[1]);
+            
+            if (player.classList.contains('active')) {
+                player.classList.remove('active');
+                audio.pause();
+                audio.src = '';
+                btnIcon.textContent = '▶';
+                return;
+            }
+            
+            document.querySelectorAll('.audio-player').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('[id^="btn-icon-"]').forEach(icon => icon.textContent = '▶');
+            
+            player.classList.add('active');
+            btnIcon.textContent = '⏸';
+            
+            if (!audio.src) {
+                try {
+                    const response = await fetch(
+                        `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
+                    );
+                    
+                    if (!response.ok) throw new Error('Recording not found');
+                    
+                    const data = await response.json();
+                    
+                    if (data.recordings && data.recordings.length > 0) {
+                        const recording = data.recordings[0];
+                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
+                        
+                        audio.src = audioUrl;
+                        setupAudioEvents(audio, playerId);
+                        audio.play();
+                    } else {
+                        showAlert('No recording available for this call', 'error');
+                        player.classList.remove('active');
+                    }
+                } catch (error) {
+                    console.error('Error loading recording:', error);
+                    showAlert('Error: ' + error.message, 'error');
+                    player.classList.remove('active');
+                }
+            } else {
+                audio.play();
+            }
+        }
+
+        function setupAudioEvents(audio, playerId) {
+            const playerNum = playerId.split('-')[1];
+            const playPauseBtn = document.getElementById('playpause-' + playerNum);
+            const progressBar = document.getElementById('progress-' + playerNum);
+            const timeDisplay = document.getElementById('time-' + playerNum);
+            
+            audio.addEventListener('loadedmetadata', () => {
+                updateTimeDisplay(audio, timeDisplay);
+            });
+            
+            audio.addEventListener('timeupdate', () => {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = progress + '%';
+                updateTimeDisplay(audio, timeDisplay);
+            });
+            
+            audio.addEventListener('play', () => {
+                playPauseBtn.textContent = '⏸';
+            });
+            
+            audio.addEventListener('pause', () => {
+                playPauseBtn.textContent = '▶';
+            });
+            
+            audio.addEventListener('ended', () => {
+                playPauseBtn.textContent = '▶';
+                progressBar.style.width = '0%';
+            });
+        }
+
+        function togglePlayPause(playerId) {
+            const playerNum = playerId.split('-')[1];
+            const audio = document.getElementById('audio-' + playerNum);
+            
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        function seek(event, playerId) {
+            const playerNum = playerId.split('-')[1];
+            const audio = document.getElementById('audio-' + playerNum);
+            const progressContainer = event.currentTarget;
+            const clickPosition = event.offsetX / progressContainer.offsetWidth;
+            audio.currentTime = clickPosition * audio.duration;
+        }
+
+        function updateTimeDisplay(audio, timeDisplay) {
+            const current = formatTime(audio.currentTime);
+            const duration = formatTime(audio.duration);
+            timeDisplay.textContent = `${current} / ${duration}`;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        async function refreshAll() {
+            const spinner = document.getElementById('loadingSpinner');
+            const btn = document.querySelector('.refresh-btn');
+            
+            spinner.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                const callData = await fetchCallLogs(CONFIG);
+                updateCallMetrics(callData);
+                updateCallTable(callData, CONFIG);
+                
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+                showAlert('Data refreshed successfully!', 'success');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showAlert(`Error: ${error.message}`, 'error');
+            } finally {
+                spinner.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // Auto-load on page load
+        window.addEventListener('load', () => {
+            refreshAll();
+        });
+    </script>
+</body>
+</html>
