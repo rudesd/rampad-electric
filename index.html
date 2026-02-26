@@ -702,21 +702,20 @@
                 <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
                     <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
                     <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
-                    <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
                 </div>
             </div>
             <canvas id="trafficChart"></canvas>
         </div>
 
-        <!-- Most Viewed & Referrers -->
+        <!-- Most Viewed & Most Popular Time -->
         <div class="two-col-grid">
             <div class="list-card">
                 <div class="list-card-title">Most Viewed</div>
                 <div id="topPostsList"><p class="no-data">Loading...</p></div>
             </div>
             <div class="list-card">
-                <div class="list-card-title">Referrers</div>
-                <div id="referrersList"><p class="no-data">Loading...</p></div>
+                <div class="list-card-title">Most Popular Time</div>
+                <div id="popularTimeList"><p class="no-data">Loading...</p></div>
             </div>
         </div>
 
@@ -786,7 +785,7 @@
         }
 
         function getPeriodDays() {
-            return websitePeriod === 'week' ? 7 : websitePeriod === 'month' ? 30 : 90;
+            return websitePeriod === 'week' ? 7 : 30;
         }
 
         async function changeWebsitePeriod(period) {
@@ -884,10 +883,8 @@
             let filteredVisits = visits;
             if (websitePeriod === 'week') {
                 filteredVisits = visits.slice(-7);
-            } else if (websitePeriod === 'month') {
+            } else {
                 filteredVisits = visits.slice(-30);
-            } else if (websitePeriod === 'quarter') {
-                filteredVisits = visits.slice(-90);
             }
 
             // Stat cards reflect selected period
@@ -904,11 +901,8 @@
                 trafficChart.update();
             }
 
-            // Top posts
             renderTopPosts(data.topPosts || []);
-
-            // Referrers
-            renderReferrers(data.referrers || []);
+            renderPopularTime(data.insights || {});
         }
 
         function renderTopPosts(posts) {
@@ -922,15 +916,32 @@
             `).join('');
         }
 
-        function renderReferrers(groups) {
-            const el = document.getElementById('referrersList');
-            if (!groups.length) { el.innerHTML = '<p class="no-data">No data available</p>'; return; }
-            el.innerHTML = groups.slice(0, 8).map(g => `
-                <div class="list-row">
-                    <span class="list-label" title="${g.name}">${g.name}</span>
-                    <span class="list-value">${(g.views || 0).toLocaleString()}</span>
-                </div>
-            `).join('');
+        function renderPopularTime(insights) {
+            const el = document.getElementById('popularTimeList');
+            const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            const hours = ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am',
+                           '12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
+
+            const bestDay = insights.highest_day_of_week != null ? days[insights.highest_day_of_week] : null;
+            const bestDayPct = insights.highest_day_percent != null ? Math.round(insights.highest_day_percent * 100) : null;
+            const bestHour = insights.highest_hour != null ? hours[insights.highest_hour] : null;
+            const bestHourPct = insights.highest_hour_percent != null ? Math.round(insights.highest_hour_percent * 100) : null;
+
+            if (!bestDay && !bestHour) {
+                el.innerHTML = '<p class="no-data">No data available</p>';
+                return;
+            }
+
+            el.innerHTML = `
+                ${bestDay ? `<div class="list-row">
+                    <span class="list-label">Best day</span>
+                    <span class="list-value">${bestDay}${bestDayPct != null ? ` · ${bestDayPct}% of views` : ''}</span>
+                </div>` : ''}
+                ${bestHour ? `<div class="list-row">
+                    <span class="list-label">Best hour</span>
+                    <span class="list-value">${bestHour}${bestHourPct != null ? ` · ${bestHourPct}% of views` : ''}</span>
+                </div>` : ''}
+            `;
         }
 
         function getPeriodCutoff() {
