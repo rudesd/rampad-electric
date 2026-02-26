@@ -821,7 +821,8 @@
                 return;
             }
 
-            tbody.innerHTML = calls.slice(0, 50).map((call, index) => {
+            const displayedCalls = calls.slice(0, 50);
+            tbody.innerHTML = displayedCalls.map((call, index) => {
                 const date = new Date(call.startTime);
                 const duration = Math.floor(call.duration / 60);
                 const seconds = call.duration % 60;
@@ -843,6 +844,7 @@
                         <td>${duration}:${seconds.toString().padStart(2, '0')}</td>
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
+                            <div id="recording-cell-${index}">
                             ${call.duration > 0 ? `
                                 <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}')">
                                     <span id="btn-icon-${index}">▶</span> Play
@@ -858,10 +860,31 @@
                                     <audio id="audio-${index}" preload="none"></audio>
                                 </div>
                             ` : '-'}
+                            </div>
                         </td>
                     </tr>
                 `;
             }).join('');
+
+            // Background check: hide play buttons for calls with no recordings
+            checkRecordingsInBackground(displayedCalls, config);
+        }
+
+        async function checkRecordingsInBackground(calls, config) {
+            for (let index = 0; index < calls.length; index++) {
+                const call = calls[index];
+                if (call.duration <= 0) continue;
+                try {
+                    const res = await fetch(`${config.backendUrl}/api/twilio/recordings/${call.sid}?client=rampad`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.recordings || data.recordings.length === 0) {
+                            const cell = document.getElementById(`recording-cell-${index}`);
+                            if (cell) cell.innerHTML = '-';
+                        }
+                    }
+                } catch (e) { /* ignore */ }
+            }
         }
 
         async function toggleRecording(callSid, playerId, backendUrl) {
