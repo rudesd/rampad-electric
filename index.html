@@ -749,8 +749,10 @@
     <script>
         const CONFIG_KEY = 'rampad_dashboard_config';
         let trafficChart;
-        let websitePeriod = 'week'; // Default to 7 days
-        let cachedWebsiteData = null; // Cache data to avoid re-fetching
+        let websitePeriod = 'week';
+        let cachedWebsiteData = null;
+        let cachedCallData = null;
+        let cachedConfig = null;
 
         function loadConfig() {
             const saved = localStorage.getItem(CONFIG_KEY);
@@ -783,20 +785,31 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        function changeWebsitePeriod(period) {
+        function getPeriodDays() {
+            return websitePeriod === 'week' ? 7 : websitePeriod === 'month' ? 30 : 90;
+        }
+
+        async function changeWebsitePeriod(period) {
             websitePeriod = period;
-            
-            // Update active tab
-            document.querySelectorAll('.time-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+
+            document.querySelectorAll('.time-tab').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`[data-period="${period}"]`).classList.add('active');
-            
-            // Update subtitle
-            
-            // Re-render with cached data if available
-            if (cachedWebsiteData) {
-                updateWebsiteMetrics(cachedWebsiteData);
+
+            // Re-fetch Jetpack with new period (top-posts/referrers are server-side filtered)
+            if (cachedConfig && cachedConfig.jetpackSiteId && cachedConfig.jetpackToken) {
+                try {
+                    const websiteData = await fetchWebsiteAnalytics(cachedConfig);
+                    updateWebsiteMetrics(websiteData);
+                } catch (e) {
+                    // If refetch fails, re-render chart/stats from cached data only
+                    if (cachedWebsiteData) updateWebsiteMetrics(cachedWebsiteData);
+                }
+            }
+
+            // Re-filter call logs by new period
+            if (cachedCallData && cachedConfig) {
+                updateCallMetrics(cachedCallData);
+                updateCallTable(cachedCallData, cachedConfig);
             }
         }
 
@@ -843,8 +856,9 @@
         }
 
         async function fetchWebsiteAnalytics(config) {
+            const days = getPeriodDays();
             const response = await fetch(
-                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}`
+                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}&days=${days}`
             );
             if (!response.ok) throw new Error('Failed to fetch website analytics');
             return await response.json();
@@ -919,12 +933,20 @@
             `).join('');
         }
 
+        function getPeriodCutoff() {
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - getPeriodDays());
+            return cutoff;
+        }
+
         function updateCallMetrics(data) {
-            const calls = data.calls || [];
+            const allCalls = data.calls || [];
+            const cutoff = getPeriodCutoff();
+            const calls = allCalls.filter(c => c.startTime && new Date(c.startTime) >= cutoff);
             document.getElementById('totalCalls').textContent = calls.length;
-            
+
             const today = new Date().toISOString().split('T')[0];
-            const todayCalls = calls.filter(call => 
+            const todayCalls = calls.filter(call =>
                 call.startTime && call.startTime.startsWith(today)
             ).length;
             document.getElementById('todayCalls').textContent = todayCalls;
@@ -932,7 +954,8 @@
 
         function updateCallTable(data, config) {
             const tbody = document.getElementById('callsBody');
-            const calls = data.calls || [];
+            const cutoff = getPeriodCutoff();
+            const calls = (data.calls || []).filter(c => c.startTime && new Date(c.startTime) >= cutoff);
 
             if (calls.length === 0) {
                 tbody.innerHTML = `
@@ -1149,29 +1172,39 @@
 
         async function refreshAll() {
             const config = loadConfig();
-            
+
             if (!config) {
                 showAlert('Please configure your settings first', 'error');
                 return;
             }
 
+            cachedConfig = config;
+
             const spinner = document.getElementById('loadingSpinner');
             const btn = document.querySelector('.refresh-btn');
-            
+
             spinner.style.display = 'block';
             btn.disabled = true;
 
             try {
-                // Fetch website analytics if configured
+                const fetches = [];
+
                 if (config.jetpackSiteId && config.jetpackToken) {
-                    const websiteData = await fetchWebsiteAnalytics(config);
-                    updateWebsiteMetrics(websiteData);
+                    fetches.push(
+                        fetchWebsiteAnalytics(config).then(data => updateWebsiteMetrics(data))
+                    );
                 }
 
-                const callData = await fetchCallLogs(config);
-                updateCallMetrics(callData);
-                updateCallTable(callData, config);
-                
+                fetches.push(
+                    fetchCallLogs(config).then(data => {
+                        cachedCallData = data;
+                        updateCallMetrics(data);
+                        updateCallTable(data, config);
+                    })
+                );
+
+                await Promise.all(fetches);
+
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
                 showAlert('Data refreshed successfully!', 'success');
             } catch (error) {
