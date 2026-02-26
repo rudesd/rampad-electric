@@ -324,6 +324,9 @@
         }
 
         .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
@@ -607,14 +610,7 @@
         </div>
 
         <!-- Key Metrics -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 600;">Website Analytics</h2>
-            <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
-                <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
-                <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
-                <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
-            </div>
-        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Website Analytics</h2>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -639,7 +635,11 @@
         <div class="chart-card">
             <div class="chart-header">
                 <h3 class="chart-title">Website Traffic</h3>
-                <p class="chart-subtitle" id="chartSubtitle">Last 7 days</p>
+                <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
+                    <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
+                    <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
+                    <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
+                </div>
             </div>
             <canvas id="trafficChart"></canvas>
         </div>
@@ -717,8 +717,6 @@
             document.querySelector(`[data-period="${period}"]`).classList.add('active');
             
             // Update subtitle
-            const periodText = period === 'week' ? 'Last 7 days' : period === 'month' ? 'Last 30 days' : 'Last 90 days';
-            document.getElementById('chartSubtitle').textContent = periodText;
             
             // Re-render with cached data if available
             if (cachedWebsiteData) {
