@@ -473,15 +473,9 @@
     <div id="alert" class="alert"></div>
 
     <script>
-        // ============================================
-        // PRE-CONFIGURED CREDENTIALS
-        // ============================================
         const CONFIG = {
-            backendUrl: 'https://analytics-backend-production-e34a.up.railway.app',
-            twilioAccountSid: 'ACd6b6de90ab8410b8bd9688fa99f49034',
-            twilioAuthToken: '2ab7ab96a8c6e773b93397d1acd0d83c'
+            backendUrl: 'https://analytics-backend-production-e34a.up.railway.app'
         };
-        // ============================================
 
         function showAlert(message, type) {
             const alert = document.getElementById('alert');
@@ -492,7 +486,7 @@
 
         async function fetchCallLogs(config) {
             const response = await fetch(
-                `${config.backendUrl}/api/twilio/calls?accountSid=${config.twilioAccountSid}&authToken=${encodeURIComponent(config.twilioAuthToken)}&pageSize=50`
+                `${config.backendUrl}/api/twilio/calls?pageSize=50`
             );
             if (!response.ok) throw new Error('Failed to fetch call logs');
             return await response.json();
@@ -555,7 +549,7 @@
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
                             ${call.duration > 0 ? `
-                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">
+                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}')">
                                     <span id="btn-icon-${index}">▶</span> Play
                                 </button>
                                 <div class="audio-player" id="player-${index}">
@@ -575,11 +569,11 @@
             }).join('');
         }
 
-        async function toggleRecording(callSid, playerId, backendUrl, accountSid, authToken) {
+        async function toggleRecording(callSid, playerId, backendUrl) {
             const player = document.getElementById(playerId);
             const audio = document.getElementById('audio-' + playerId.split('-')[1]);
             const btnIcon = document.getElementById('btn-icon-' + playerId.split('-')[1]);
-            
+
             if (player.classList.contains('active')) {
                 player.classList.remove('active');
                 audio.pause();
@@ -587,27 +581,27 @@
                 btnIcon.textContent = '▶';
                 return;
             }
-            
+
             document.querySelectorAll('.audio-player').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('[id^="btn-icon-"]').forEach(icon => icon.textContent = '▶');
-            
+
             player.classList.add('active');
             btnIcon.textContent = '⏸';
-            
+
             if (!audio.src) {
                 try {
                     const response = await fetch(
-                        `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
+                        `${backendUrl}/api/twilio/recordings/${callSid}`
                     );
-                    
+
                     if (!response.ok) throw new Error('Recording not found');
-                    
+
                     const data = await response.json();
-                    
+
                     if (data.recordings && data.recordings.length > 0) {
                         const recording = data.recordings[0];
-                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
-                        
+                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}`;
+
                         audio.src = audioUrl;
                         setupAudioEvents(audio, playerId);
                         audio.play();

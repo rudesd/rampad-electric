@@ -194,6 +194,105 @@ app.get('/api/client/:clientId/analytics', async (req, res) => {
     }
 });
 
+// ==========================================
+// TWILIO ENDPOINTS
+// ==========================================
+
+app.get('/api/twilio/calls', async (req, res) => {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    if (!accountSid || !authToken) {
+        return res.status(500).json({ error: 'Twilio credentials not configured on server' });
+    }
+
+    const { pageSize = 50 } = req.query;
+
+    try {
+        const response = await fetch(
+            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json?PageSize=${pageSize}`,
+            {
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+                }
+            }
+        );
+
+        if (!response.ok) {
+            const error = await response.json();
+            return res.status(response.status).json({ error: error.message || 'Twilio API error' });
+        }
+
+        const data = await response.json();
+        res.json({ calls: data.calls });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error', message: error.message });
+    }
+});
+
+app.get('/api/twilio/recordings/:callSid', async (req, res) => {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    if (!accountSid || !authToken) {
+        return res.status(500).json({ error: 'Twilio credentials not configured on server' });
+    }
+
+    const { callSid } = req.params;
+
+    try {
+        const response = await fetch(
+            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls/${callSid}/Recordings.json`,
+            {
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+                }
+            }
+        );
+
+        if (!response.ok) {
+            const error = await response.json();
+            return res.status(response.status).json({ error: error.message || 'Twilio API error' });
+        }
+
+        const data = await response.json();
+        res.json({ recordings: data.recordings });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error', message: error.message });
+    }
+});
+
+app.get('/api/twilio/recording-stream/:recordingSid', async (req, res) => {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    if (!accountSid || !authToken) {
+        return res.status(500).json({ error: 'Twilio credentials not configured on server' });
+    }
+
+    const { recordingSid } = req.params;
+
+    try {
+        const response = await fetch(
+            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}.mp3`,
+            {
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return res.status(response.status).json({ error: 'Recording not found' });
+        }
+
+        res.setHeader('Content-Type', 'audio/mpeg');
+        response.body.pipe(res);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error', message: error.message });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Analytics API Server running on http://localhost:${PORT}`);
