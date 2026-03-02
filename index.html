@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rampad Electric - Analytics & Call Logs</title>
+    <title>Rampad Electric - Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,123 +121,6 @@
             to { transform: rotate(360deg); }
         }
 
-        .config-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            display: none;
-        }
-
-        .gear-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            padding: 0.25rem 0.5rem;
-            opacity: 0.4;
-            transition: opacity 0.2s;
-        }
-
-        .gear-btn:hover {
-            opacity: 1;
-        }
-
-        .config-panel h3 {
-            margin-bottom: 1rem;
-            color: var(--accent-primary);
-        }
-
-        .config-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .config-section-title {
-            font-size: 0.875rem;
-            color: var(--accent-primary);
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .config-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .config-field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .config-field label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .config-field input {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-        }
-
-        .config-field input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
-        }
-
-        .save-config-btn {
-            background: var(--accent-primary);
-            border: none;
-            color: var(--bg-primary);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .save-config-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px var(--shadow);
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .alert.show {
-            display: block;
-        }
-
-        .alert-error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--accent-danger);
-            color: var(--accent-danger);
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--accent-success);
-            color: var(--accent-success);
-        }
-
         .time-tab {
             padding: 0.5rem 1rem;
             background: transparent;
@@ -324,9 +207,6 @@
         }
 
         .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
@@ -506,26 +386,6 @@
             border-radius: 3px;
             width: 0%;
             transition: width 0.1s;
-            pointer-events: none;
-        }
-
-        .speed-btn {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            flex-shrink: 0;
-        }
-
-        .speed-btn.active {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            border-color: var(--accent-primary);
         }
 
         .audio-time {
@@ -536,74 +396,39 @@
             text-align: right;
         }
 
-        .two-col-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .list-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-
-        .list-card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
             margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border);
+            display: none;
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            max-width: 400px;
+            z-index: 1000;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .list-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-            gap: 1rem;
+        .alert.show {
+            display: block;
+            animation: slideInRight 0.3s ease-out;
         }
 
-        .list-row:last-child {
-            border-bottom: none;
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        .list-label {
-            font-size: 0.875rem;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 75%;
+        .alert-error {
+            background: rgba(239, 68, 68, 0.95);
+            border: 1px solid var(--accent-danger);
+            color: white;
         }
 
-        .list-value {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--accent-primary);
-            font-family: 'JetBrains Mono', monospace;
-            flex-shrink: 0;
-        }
-
-        .no-data {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            text-align: center;
-            padding: 1rem 0;
-        }
-
-        @media (max-width: 768px) {
-            .two-col-grid { grid-template-columns: 1fr; }
-        }
-
-        .audio-loading {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-style: italic;
+        .alert-success {
+            background: rgba(16, 185, 129, 0.95);
+            border: 1px solid var(--accent-success);
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -619,16 +444,17 @@
                 grid-template-columns: 1fr;
             }
 
-            .config-grid {
-                grid-template-columns: 1fr;
-            }
-
             table {
                 font-size: 0.75rem;
             }
 
             th, td {
                 padding: 0.75rem 0.5rem;
+            }
+
+            .alert {
+                right: 1rem;
+                max-width: calc(100% - 2rem);
             }
         }
     </style>
@@ -638,43 +464,23 @@
         <header>
             <h1>Rampad Electric Dashboard</h1>
             <div class="header-meta">
-                <span>Last updated: <strong id="lastUpdated">Not yet loaded</strong></span>
+                <span>Last updated: <strong id="lastUpdated">Loading...</strong></span>
                 <button class="refresh-btn" onclick="refreshAll()">
                     <div class="loading-spinner" id="loadingSpinner"></div>
                     <span>Refresh All</span>
                 </button>
-                <button class="gear-btn" onclick="document.querySelector('.config-panel').style.display = document.querySelector('.config-panel').style.display === 'none' ? 'block' : 'none'" title="Settings">⚙️</button>
             </div>
         </header>
 
-        <!-- Configuration Panel -->
-        <div class="config-panel">
-            <h3>🔑 Configuration</h3>
-            <div id="configAlert" class="alert"></div>
-            
-            <div class="config-section">
-                <div class="config-section-title">📊 Website Analytics</div>
-                <div class="config-grid">
-                    <div class="config-field">
-                        <label for="backendUrl">Backend Server URL</label>
-                        <input type="text" id="backendUrl" value="https://analytics-backend-production-e34a.up.railway.app">
-                    </div>
-                    <div class="config-field">
-                        <label for="jetpackSiteId">Jetpack Site ID</label>
-                        <input type="text" id="jetpackSiteId" value="rampadelectric.com">
-                    </div>
-                    <div class="config-field">
-                        <label for="jetpackToken">Jetpack Token</label>
-                        <input type="password" id="jetpackToken">
-                    </div>
-                </div>
+        <!-- Website Analytics -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 600;">Website Analytics</h2>
+            <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
+                <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
+                <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
+                <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
             </div>
-
-            <button class="save-config-btn" onclick="saveConfig()">Save Configuration</button>
         </div>
-
-        <!-- Key Metrics -->
-        <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Website Analytics</h2>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -699,24 +505,9 @@
         <div class="chart-card">
             <div class="chart-header">
                 <h3 class="chart-title">Website Traffic</h3>
-                <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
-                    <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
-                    <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
-                </div>
+                <p class="chart-subtitle" id="chartSubtitle">Last 7 days</p>
             </div>
             <canvas id="trafficChart"></canvas>
-        </div>
-
-        <!-- Most Viewed & Most Popular Time -->
-        <div class="two-col-grid">
-            <div class="list-card">
-                <div class="list-card-title">Most Viewed</div>
-                <div id="topPostsList"><p class="no-data">Loading...</p></div>
-            </div>
-            <div class="list-card">
-                <div class="list-card-title">Most Popular Time</div>
-                <div id="popularTimeList"><p class="no-data">Loading...</p></div>
-            </div>
         </div>
 
         <!-- Call Log Table -->
@@ -737,7 +528,7 @@
                 <tbody id="callsBody">
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                            Configure Twilio credentials above and click "Refresh All"
+                            Loading call data...
                         </td>
                     </tr>
                 </tbody>
@@ -745,70 +536,45 @@
         </div>
     </div>
 
+    <div id="alert" class="alert"></div>
+
     <script>
-        const CONFIG_KEY = 'rampad_dashboard_config';
+        // ============================================
+        // PRE-CONFIGURED CREDENTIALS
+        // ============================================
+        const CONFIG = {
+            backendUrl: 'https://analytics-backend-production-e34a.up.railway.app',
+            jetpackSiteId: 'rampadelectric.com',
+            jetpackToken: '&H$5gUo2I$A5mz%otYz!q)bFnOFVMTqb6XjaJ7mw@5^9z1&3C5xaM#r2a6#KOO!V',
+            twilioAccountSid: 'ACd6b6de90ab8410b8bd9688fa99f49034',
+            twilioAuthToken: '2ab7ab96a8c6e773b93397d1acd0d83c'
+        };
+        // ============================================
+
         let trafficChart;
         let websitePeriod = 'week';
         let cachedWebsiteData = null;
-        let cachedCallData = null;
-        let cachedConfig = null;
-
-        function loadConfig() {
-            const saved = localStorage.getItem(CONFIG_KEY);
-            if (saved) {
-                const config = JSON.parse(saved);
-                document.getElementById('backendUrl').value = config.backendUrl || '';
-                document.getElementById('jetpackSiteId').value = config.jetpackSiteId || '';
-                document.getElementById('jetpackToken').value = config.jetpackToken || '';
-                return config;
-            }
-            return null;
-        }
-
-        function saveConfig() {
-            const config = {
-                backendUrl: document.getElementById('backendUrl').value,
-                jetpackSiteId: document.getElementById('jetpackSiteId').value,
-                jetpackToken: document.getElementById('jetpackToken').value
-            };
-
-            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-            showAlert('Configuration saved!', 'success');
-            setTimeout(() => refreshAll(), 1000);
-        }
 
         function showAlert(message, type) {
-            const alert = document.getElementById('configAlert');
+            const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        function getPeriodDays() {
-            return websitePeriod === 'week' ? 7 : 30;
-        }
-
-        async function changeWebsitePeriod(period) {
+        function changeWebsitePeriod(period) {
             websitePeriod = period;
-
-            document.querySelectorAll('.time-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.querySelectorAll('.time-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
             document.querySelector(`[data-period="${period}"]`).classList.add('active');
-
-            // Re-fetch Jetpack with new period (top-posts/referrers are server-side filtered)
-            if (cachedConfig && cachedConfig.jetpackSiteId && cachedConfig.jetpackToken) {
-                try {
-                    const websiteData = await fetchWebsiteAnalytics(cachedConfig);
-                    updateWebsiteMetrics(websiteData);
-                } catch (e) {
-                    // If refetch fails, re-render chart/stats from cached data only
-                    if (cachedWebsiteData) updateWebsiteMetrics(cachedWebsiteData);
-                }
-            }
-
-            // Re-filter call logs by new period
-            if (cachedCallData && cachedConfig) {
-                updateCallMetrics(cachedCallData);
-                updateCallTable(cachedCallData, cachedConfig);
+            
+            const periodText = period === 'week' ? 'Last 7 days' : period === 'month' ? 'Last 30 days' : 'Last 90 days';
+            document.getElementById('chartSubtitle').textContent = periodText;
+            
+            if (cachedWebsiteData) {
+                updateWebsiteMetrics(cachedWebsiteData);
             }
         }
 
@@ -855,9 +621,8 @@
         }
 
         async function fetchWebsiteAnalytics(config) {
-            const days = getPeriodDays();
             const response = await fetch(
-                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}&days=${days}`
+                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}`
             );
             if (!response.ok) throw new Error('Failed to fetch website analytics');
             return await response.json();
@@ -865,7 +630,7 @@
 
         async function fetchCallLogs(config) {
             const response = await fetch(
-                `${config.backendUrl}/api/twilio/calls?pageSize=50&client=rampad`
+                `${config.backendUrl}/api/twilio/calls?accountSid=${config.twilioAccountSid}&authToken=${encodeURIComponent(config.twilioAuthToken)}&pageSize=50`
             );
             if (!response.ok) throw new Error('Failed to fetch call logs');
             return await response.json();
@@ -873,91 +638,39 @@
 
         function updateWebsiteMetrics(data) {
             cachedWebsiteData = data;
+            
+            const stats = data.stats || {};
+            
+            document.getElementById('totalViews').textContent = (stats.views || 0).toLocaleString();
+            document.getElementById('totalVisitors').textContent = (stats.visitors || 0).toLocaleString();
 
-            // Filter chart data based on selected period
             const visits = data.visits?.data || [];
-            const fields = data.visits?.fields || [];
-            const viewsIdx = fields.indexOf('views') >= 0 ? fields.indexOf('views') : 2;
-            const visitorsIdx = fields.indexOf('visitors') >= 0 ? fields.indexOf('visitors') : 1;
-
-            let filteredVisits = visits;
-            if (websitePeriod === 'week') {
-                filteredVisits = visits.slice(-7);
-            } else {
-                filteredVisits = visits.slice(-30);
-            }
-
-            // Stat cards reflect selected period
-            const periodViews = filteredVisits.reduce((sum, v) => sum + (v[viewsIdx] || 0), 0);
-            const periodVisitors = filteredVisits.reduce((sum, v) => sum + (v[visitorsIdx] || 0), 0);
-            document.getElementById('totalViews').textContent = periodViews.toLocaleString();
-            document.getElementById('totalVisitors').textContent = periodVisitors.toLocaleString();
-
-            if (filteredVisits.length > 0) {
+            if (visits.length > 0) {
+                let filteredVisits = visits;
+                
+                if (websitePeriod === 'week') {
+                    filteredVisits = visits.slice(-7);
+                } else if (websitePeriod === 'month') {
+                    filteredVisits = visits.slice(-30);
+                } else if (websitePeriod === 'quarter') {
+                    filteredVisits = visits.slice(-90);
+                }
+                
                 const labels = filteredVisits.map(v => v[0]);
-                const values = filteredVisits.map(v => v[viewsIdx] || v[1]);
+                const values = filteredVisits.map(v => v[1]);
+                
                 trafficChart.data.labels = labels;
                 trafficChart.data.datasets[0].data = values;
                 trafficChart.update();
             }
-
-            renderTopPosts(data.topPosts || []);
-            renderPopularTime(data.insights || {});
-        }
-
-        function renderTopPosts(posts) {
-            const el = document.getElementById('topPostsList');
-            if (!posts.length) { el.innerHTML = '<p class="no-data">No data available</p>'; return; }
-            el.innerHTML = posts.slice(0, 8).map(p => `
-                <div class="list-row">
-                    <span class="list-label" title="${p.title}">${p.title || 'Home'}</span>
-                    <span class="list-value">${(p.views || 0).toLocaleString()}</span>
-                </div>
-            `).join('');
-        }
-
-        function renderPopularTime(insights) {
-            const el = document.getElementById('popularTimeList');
-            const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-            const hours = ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am',
-                           '12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm'];
-
-            const bestDay = insights.highest_day_of_week != null ? days[insights.highest_day_of_week] : null;
-            const bestDayPct = insights.highest_day_percent != null ? Math.round(insights.highest_day_percent) : null;
-            const bestHour = insights.highest_hour != null ? hours[insights.highest_hour] : null;
-            const bestHourPct = insights.highest_hour_percent != null ? Math.round(insights.highest_hour_percent) : null;
-
-            if (!bestDay && !bestHour) {
-                el.innerHTML = '<p class="no-data">No data available</p>';
-                return;
-            }
-
-            el.innerHTML = `
-                ${bestDay ? `<div class="list-row">
-                    <span class="list-label">Best day</span>
-                    <span class="list-value">${bestDay}${bestDayPct != null ? ` · ${bestDayPct}% of views` : ''}</span>
-                </div>` : ''}
-                ${bestHour ? `<div class="list-row">
-                    <span class="list-label">Best hour</span>
-                    <span class="list-value">${bestHour}${bestHourPct != null ? ` · ${bestHourPct}% of views` : ''}</span>
-                </div>` : ''}
-            `;
-        }
-
-        function getPeriodCutoff() {
-            const cutoff = new Date();
-            cutoff.setDate(cutoff.getDate() - getPeriodDays());
-            return cutoff;
         }
 
         function updateCallMetrics(data) {
-            const allCalls = data.calls || [];
-            const cutoff = getPeriodCutoff();
-            const calls = allCalls.filter(c => c.startTime && new Date(c.startTime) >= cutoff);
+            const calls = data.calls || [];
             document.getElementById('totalCalls').textContent = calls.length;
-
+            
             const today = new Date().toISOString().split('T')[0];
-            const todayCalls = calls.filter(call =>
+            const todayCalls = calls.filter(call => 
                 call.startTime && call.startTime.startsWith(today)
             ).length;
             document.getElementById('todayCalls').textContent = todayCalls;
@@ -965,8 +678,7 @@
 
         function updateCallTable(data, config) {
             const tbody = document.getElementById('callsBody');
-            const cutoff = getPeriodCutoff();
-            const calls = (data.calls || []).filter(c => c.startTime && new Date(c.startTime) >= cutoff);
+            const calls = data.calls || [];
 
             if (calls.length === 0) {
                 tbody.innerHTML = `
@@ -979,8 +691,7 @@
                 return;
             }
 
-            const displayedCalls = calls.slice(0, 50);
-            tbody.innerHTML = displayedCalls.map((call, index) => {
+            tbody.innerHTML = calls.slice(0, 50).map((call, index) => {
                 const date = new Date(call.startTime);
                 const duration = Math.floor(call.duration / 60);
                 const seconds = call.duration % 60;
@@ -1002,9 +713,8 @@
                         <td>${duration}:${seconds.toString().padStart(2, '0')}</td>
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
-                            <div id="recording-cell-${index}">
                             ${call.duration > 0 ? `
-                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}')">
+                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">
                                     <span id="btn-icon-${index}">▶</span> Play
                                 </button>
                                 <div class="audio-player" id="player-${index}">
@@ -1014,45 +724,21 @@
                                             <div class="audio-progress-bar" id="progress-${index}"></div>
                                         </div>
                                         <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
-                                        <button class="speed-btn active" id="speed-${index}-1" onclick="setSpeed('player-${index}', 1)">1x</button>
-                                        <button class="speed-btn" id="speed-${index}-15" onclick="setSpeed('player-${index}', 1.5)">1.5x</button>
-                                        <button class="speed-btn" id="speed-${index}-2" onclick="setSpeed('player-${index}', 2)">2x</button>
                                     </div>
                                     <audio id="audio-${index}" preload="none"></audio>
                                 </div>
                             ` : '-'}
-                            </div>
                         </td>
                     </tr>
                 `;
             }).join('');
-
-            // Background check: hide play buttons for calls with no recordings
-            checkRecordingsInBackground(displayedCalls, config);
         }
 
-        async function checkRecordingsInBackground(calls, config) {
-            for (let index = 0; index < calls.length; index++) {
-                const call = calls[index];
-                if (call.duration <= 0) continue;
-                try {
-                    const res = await fetch(`${config.backendUrl}/api/twilio/recordings/${call.sid}?client=rampad`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (!data.recordings || data.recordings.length === 0) {
-                            const cell = document.getElementById(`recording-cell-${index}`);
-                            if (cell) cell.innerHTML = '-';
-                        }
-                    }
-                } catch (e) { /* ignore */ }
-            }
-        }
-
-        async function toggleRecording(callSid, playerId, backendUrl) {
+        async function toggleRecording(callSid, playerId, backendUrl, accountSid, authToken) {
             const player = document.getElementById(playerId);
             const audio = document.getElementById('audio-' + playerId.split('-')[1]);
             const btnIcon = document.getElementById('btn-icon-' + playerId.split('-')[1]);
-
+            
             if (player.classList.contains('active')) {
                 player.classList.remove('active');
                 audio.pause();
@@ -1060,35 +746,28 @@
                 btnIcon.textContent = '▶';
                 return;
             }
-
+            
             document.querySelectorAll('.audio-player').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('[id^="btn-icon-"]').forEach(icon => icon.textContent = '▶');
-
+            
             player.classList.add('active');
             btnIcon.textContent = '⏸';
-
+            
             if (!audio.src) {
                 try {
                     const response = await fetch(
-                        `${backendUrl}/api/twilio/recordings/${callSid}?client=rampad`
+                        `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
                     );
-
+                    
                     if (!response.ok) throw new Error('Recording not found');
-
+                    
                     const data = await response.json();
-
+                    
                     if (data.recordings && data.recordings.length > 0) {
                         const recording = data.recordings[0];
-                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?client=rampad`;
-
-                        const playerNum = playerId.split('-')[1];
-                        const timeDisplay = document.getElementById('time-' + playerNum);
-                        timeDisplay.textContent = 'Loading...';
-
-                        const streamRes = await fetch(audioUrl);
-                        if (!streamRes.ok) throw new Error('Failed to load audio');
-                        const blob = await streamRes.blob();
-                        audio.src = URL.createObjectURL(blob);
+                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
+                        
+                        audio.src = audioUrl;
                         setupAudioEvents(audio, playerId);
                         audio.play();
                     } else {
@@ -1150,22 +829,8 @@
             const playerNum = playerId.split('-')[1];
             const audio = document.getElementById('audio-' + playerNum);
             const progressContainer = event.currentTarget;
-            const rect = progressContainer.getBoundingClientRect();
-            const clickPosition = (event.clientX - rect.left) / rect.width;
-            if (audio.duration && !isNaN(audio.duration)) {
-                audio.currentTime = Math.max(0, Math.min(1, clickPosition)) * audio.duration;
-            }
-        }
-
-        function setSpeed(playerId, speed) {
-            const playerNum = playerId.split('-')[1];
-            const audio = document.getElementById('audio-' + playerNum);
-            audio.playbackRate = speed;
-            const map = { 1: '1', 1.5: '15', 2: '2' };
-            Object.keys(map).forEach(s => {
-                const btn = document.getElementById(`speed-${playerNum}-${map[s]}`);
-                if (btn) btn.classList.toggle('active', parseFloat(s) === speed);
-            });
+            const clickPosition = event.offsetX / progressContainer.offsetWidth;
+            audio.currentTime = clickPosition * audio.duration;
         }
 
         function updateTimeDisplay(audio, timeDisplay) {
@@ -1182,40 +847,22 @@
         }
 
         async function refreshAll() {
-            const config = loadConfig();
-
-            if (!config) {
-                showAlert('Please configure your settings first', 'error');
-                return;
-            }
-
-            cachedConfig = config;
-
             const spinner = document.getElementById('loadingSpinner');
             const btn = document.querySelector('.refresh-btn');
-
+            
             spinner.style.display = 'block';
             btn.disabled = true;
 
             try {
-                const fetches = [];
-
-                if (config.jetpackSiteId && config.jetpackToken) {
-                    fetches.push(
-                        fetchWebsiteAnalytics(config).then(data => updateWebsiteMetrics(data))
-                    );
-                }
-
-                fetches.push(
-                    fetchCallLogs(config).then(data => {
-                        cachedCallData = data;
-                        updateCallMetrics(data);
-                        updateCallTable(data, config);
-                    })
-                );
-
-                await Promise.all(fetches);
-
+                const [websiteData, callData] = await Promise.all([
+                    fetchWebsiteAnalytics(CONFIG),
+                    fetchCallLogs(CONFIG)
+                ]);
+                
+                updateWebsiteMetrics(websiteData);
+                updateCallMetrics(callData);
+                updateCallTable(callData, CONFIG);
+                
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
                 showAlert('Data refreshed successfully!', 'success');
             } catch (error) {
@@ -1227,12 +874,10 @@
             }
         }
 
-        function init() {
+        window.addEventListener('load', () => {
             initChart();
-            loadConfig();
-        }
-
-        window.addEventListener('load', init);
+            refreshAll();
+        });
     </script>
 </body>
 </html>
