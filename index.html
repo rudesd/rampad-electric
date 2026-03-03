@@ -539,18 +539,8 @@
     <div id="alert" class="alert"></div>
 
     <script>
-        // ============================================
-        // PRE-CONFIGURED CREDENTIALS
-        // ============================================
-        const CONFIG = {
-            backendUrl: 'https://analytics-backend-production-e34a.up.railway.app',
-            jetpackSiteId: 'rampadelectric.com',
-            jetpackToken: '&H$5gUo2I$A5mz%otYz!q)bFnOFVMTqb6XjaJ7mw@5^9z1&3C5xaM#r2a6#KOO!V',
-            twilioAccountSid: 'ACd6b6de90ab8410b8bd9688fa99f49034',
-            twilioAuthToken: '2ab7ab96a8c6e773b93397d1acd0d83c'
-        };
-        // ============================================
-
+        const BACKEND_URL = 'https://analytics-backend-production-e34a.up.railway.app';
+        
         let trafficChart;
         let websitePeriod = 'week';
         let cachedWebsiteData = null;
@@ -620,18 +610,14 @@
             });
         }
 
-        async function fetchWebsiteAnalytics(config) {
-            const response = await fetch(
-                `${config.backendUrl}/api/jetpack/${config.jetpackSiteId}?token=${encodeURIComponent(config.jetpackToken)}`
-            );
+        async function fetchWebsiteAnalytics() {
+            const response = await fetch(`${BACKEND_URL}/api/jetpack/rampad`);
             if (!response.ok) throw new Error('Failed to fetch website analytics');
             return await response.json();
         }
 
-        async function fetchCallLogs(config) {
-            const response = await fetch(
-                `${config.backendUrl}/api/twilio/calls?accountSid=${config.twilioAccountSid}&authToken=${encodeURIComponent(config.twilioAuthToken)}&pageSize=50`
-            );
+        async function fetchCallLogs() {
+            const response = await fetch(`${BACKEND_URL}/api/twilio/rampad/calls?pageSize=50`);
             if (!response.ok) throw new Error('Failed to fetch call logs');
             return await response.json();
         }
@@ -676,7 +662,7 @@
             document.getElementById('todayCalls').textContent = todayCalls;
         }
 
-        function updateCallTable(data, config) {
+        function updateCallTable(data) {
             const tbody = document.getElementById('callsBody');
             const calls = data.calls || [];
 
@@ -714,7 +700,7 @@
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
                             ${call.duration > 0 ? `
-                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}', '${config.backendUrl}', '${config.twilioAccountSid}', '${config.twilioAuthToken}')">
+                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}')">
                                     <span id="btn-icon-${index}">▶</span> Play
                                 </button>
                                 <div class="audio-player" id="player-${index}">
@@ -734,7 +720,7 @@
             }).join('');
         }
 
-        async function toggleRecording(callSid, playerId, backendUrl, accountSid, authToken) {
+        async function toggleRecording(callSid, playerId) {
             const player = document.getElementById(playerId);
             const audio = document.getElementById('audio-' + playerId.split('-')[1]);
             const btnIcon = document.getElementById('btn-icon-' + playerId.split('-')[1]);
@@ -755,9 +741,7 @@
             
             if (!audio.src) {
                 try {
-                    const response = await fetch(
-                        `${backendUrl}/api/twilio/recordings/${callSid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`
-                    );
+                    const response = await fetch(`${BACKEND_URL}/api/twilio/rampad/recordings/${callSid}`);
                     
                     if (!response.ok) throw new Error('Recording not found');
                     
@@ -765,7 +749,7 @@
                     
                     if (data.recordings && data.recordings.length > 0) {
                         const recording = data.recordings[0];
-                        const audioUrl = `${backendUrl}/api/twilio/recording-stream/${recording.sid}?accountSid=${accountSid}&authToken=${encodeURIComponent(authToken)}`;
+                        const audioUrl = `${BACKEND_URL}/api/twilio/rampad/recording-stream/${recording.sid}`;
                         
                         audio.src = audioUrl;
                         setupAudioEvents(audio, playerId);
@@ -855,13 +839,13 @@
 
             try {
                 const [websiteData, callData] = await Promise.all([
-                    fetchWebsiteAnalytics(CONFIG),
-                    fetchCallLogs(CONFIG)
+                    fetchWebsiteAnalytics(),
+                    fetchCallLogs()
                 ]);
                 
                 updateWebsiteMetrics(websiteData);
                 updateCallMetrics(callData);
-                updateCallTable(callData, CONFIG);
+                updateCallTable(callData);
                 
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
                 showAlert('Data refreshed successfully!', 'success');
