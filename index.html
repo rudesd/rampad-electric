@@ -143,13 +143,6 @@
             color: var(--bg-primary);
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -440,10 +433,6 @@
                 font-size: 2rem;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
             table {
                 font-size: 0.75rem;
             }
@@ -482,25 +471,6 @@
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Website Views</div>
-                <div class="stat-value" id="totalViews">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Visitors</div>
-                <div class="stat-value" id="totalVisitors">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Calls</div>
-                <div class="stat-value" id="totalCalls">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Today's Calls</div>
-                <div class="stat-value" id="todayCalls">-</div>
-            </div>
-        </div>
-
         <!-- Traffic Chart -->
         <div class="chart-card">
             <div class="chart-header">
@@ -510,10 +480,40 @@
             <canvas id="trafficChart"></canvas>
         </div>
 
+        <!-- Website Stats - All Time -->
+        <div style="margin-bottom: 3rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">All Time Statistics</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div class="stat-card">
+                    <div class="stat-label">Website Views</div>
+                    <div class="stat-value" id="totalViews">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Visitors</div>
+                    <div class="stat-value" id="totalVisitors">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call Stats -->
+        <div style="margin-bottom: 3rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">Call Statistics</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div class="stat-card">
+                    <div class="stat-label">Total Calls</div>
+                    <div class="stat-value" id="totalCalls">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Today's Calls</div>
+                    <div class="stat-value" id="todayCalls">-</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Call Log Table -->
         <div class="table-card">
             <div class="table-header">
-                <h3 class="table-title">📞 Recent Calls</h3>
+                <h3 class="table-title">📞 Recent Calls with Recordings</h3>
             </div>
             <table>
                 <thead>
@@ -653,10 +653,11 @@
 
         function updateCallMetrics(data) {
             const calls = data.calls || [];
-            document.getElementById('totalCalls').textContent = calls.length;
+            const callsWithRecordings = calls.filter(call => call.duration > 0);
+            document.getElementById('totalCalls').textContent = callsWithRecordings.length;
             
             const today = new Date().toISOString().split('T')[0];
-            const todayCalls = calls.filter(call => 
+            const todayCalls = callsWithRecordings.filter(call => 
                 call.startTime && call.startTime.startsWith(today)
             ).length;
             document.getElementById('todayCalls').textContent = todayCalls;
@@ -665,22 +666,23 @@
         function updateCallTable(data) {
             const tbody = document.getElementById('callsBody');
             const calls = data.calls || [];
+            
+            // Filter to only show calls with recordings (duration > 0)
+            const callsWithRecordings = calls.filter(call => call.duration > 0);
 
-            const callsWithRecordings = calls.filter(call => call.duration > 0);  if (callsWithRecordings.length === 0) {
+            if (callsWithRecordings.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                            No calls found
+                            No recorded calls found
                         </td>
                     </tr>
                 `;
                 return;
             }
 
-// Filter to only show calls with recordings
-const callsWithRecordings = calls.filter(call => call.duration > 0);
-
-tbody.innerHTML = callsWithRecordings.slice(0, 50).map((call, index) => {                const date = new Date(call.startTime);
+            tbody.innerHTML = callsWithRecordings.slice(0, 50).map((call, index) => {
+                const date = new Date(call.startTime);
                 const duration = Math.floor(call.duration / 60);
                 const seconds = call.duration % 60;
                 
@@ -701,21 +703,19 @@ tbody.innerHTML = callsWithRecordings.slice(0, 50).map((call, index) => {       
                         <td>${duration}:${seconds.toString().padStart(2, '0')}</td>
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
-                            ${call.duration > 0 ? `
-                                <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}')">
-                                    <span id="btn-icon-${index}">▶</span> Play
-                                </button>
-                                <div class="audio-player" id="player-${index}">
-                                    <div class="audio-controls">
-                                        <button class="audio-play-pause" onclick="togglePlayPause('player-${index}')" id="playpause-${index}">▶</button>
-                                        <div class="audio-progress-container" onclick="seek(event, 'player-${index}')">
-                                            <div class="audio-progress-bar" id="progress-${index}"></div>
-                                        </div>
-                                        <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
+                            <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}')">
+                                <span id="btn-icon-${index}">▶</span> Play
+                            </button>
+                            <div class="audio-player" id="player-${index}">
+                                <div class="audio-controls">
+                                    <button class="audio-play-pause" onclick="togglePlayPause('player-${index}')" id="playpause-${index}">▶</button>
+                                    <div class="audio-progress-container" onclick="seek(event, 'player-${index}')">
+                                        <div class="audio-progress-bar" id="progress-${index}"></div>
                                     </div>
-                                    <audio id="audio-${index}" preload="none"></audio>
+                                    <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
                                 </div>
-                            ` : '-'}
+                                <audio id="audio-${index}" preload="none"></audio>
+                            </div>
                         </td>
                     </tr>
                 `;
