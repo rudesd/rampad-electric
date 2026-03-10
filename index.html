@@ -653,7 +653,7 @@
 
         function updateCallMetrics(data) {
             const calls = data.calls || [];
-            const callsWithRecordings = calls.filter(call => call.duration > 0);
+            const callsWithRecordings = calls.filter(call => call.recordingAvailable === true);
             document.getElementById('totalCalls').textContent = callsWithRecordings.length;
             
             const today = new Date().toISOString().split('T')[0];
@@ -667,8 +667,8 @@
             const tbody = document.getElementById('callsBody');
             const calls = data.calls || [];
             
-            // Filter to only show calls with recordings (duration > 0)
-            const callsWithRecordings = calls.filter(call => call.duration > 0);
+            // Filter to only show calls with recordings
+            const callsWithRecordings = calls.filter(call => call.recordingAvailable === true);
 
             if (callsWithRecordings.length === 0) {
                 tbody.innerHTML = `
