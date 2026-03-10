@@ -1101,10 +1101,11 @@
             // Time update
             audio.addEventListener('loadedmetadata', () => {
                 document.getElementById('playerDuration').textContent = formatTime(audio.duration);
+                console.log('Audio loaded, duration:', audio.duration);
             });
             
             audio.addEventListener('timeupdate', () => {
-                if (!isDraggingScrubber) {
+                if (!isDraggingScrubber && !isNaN(audio.duration) && audio.duration > 0) {
                     const progress = (audio.currentTime / audio.duration) * 100;
                     scrubberFill.style.width = progress + '%';
                     scrubberHandle.style.left = progress + '%';
@@ -1129,9 +1130,21 @@
             
             // Scrubber click
             scrubber.addEventListener('click', (e) => {
+                if (isNaN(audio.duration) || audio.duration === 0) {
+                    console.log('Audio not ready yet');
+                    return;
+                }
                 const rect = scrubber.getBoundingClientRect();
                 const clickPosition = (e.clientX - rect.left) / rect.width;
-                audio.currentTime = clickPosition * audio.duration;
+                const newTime = clickPosition * audio.duration;
+                
+                console.log('Scrubber clicked:', {
+                    clickPosition,
+                    newTime,
+                    duration: audio.duration
+                });
+                
+                audio.currentTime = newTime;
                 scrubberFill.style.width = (clickPosition * 100) + '%';
                 scrubberHandle.style.left = (clickPosition * 100) + '%';
             });
@@ -1159,23 +1172,41 @@
             e.preventDefault();
             e.stopPropagation();
             
+            const audio = document.getElementById('miniPlayerAudio');
+            
+            if (isNaN(audio.duration) || audio.duration === 0) {
+                console.log('Cannot drag: audio not ready');
+                isDraggingScrubber = false;
+                return;
+            }
+            
+            console.log('Started dragging scrubber');
+            
             const moveHandler = (e) => {
                 if (!isDraggingScrubber) return;
+                if (isNaN(audio.duration) || audio.duration === 0) return;
                 
                 const scrubber = document.getElementById('playerScrubber');
-                const audio = document.getElementById('miniPlayerAudio');
                 const scrubberFill = document.getElementById('playerScrubberFill');
                 const scrubberHandle = document.getElementById('playerScrubberHandle');
                 const rect = scrubber.getBoundingClientRect();
                 const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                 const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+                const newTime = position * audio.duration;
                 
                 scrubberFill.style.width = (position * 100) + '%';
                 scrubberHandle.style.left = (position * 100) + '%';
-                audio.currentTime = position * audio.duration;
+                
+                // Use fastSeek if available, otherwise regular seek
+                if (audio.fastSeek) {
+                    audio.fastSeek(newTime);
+                } else {
+                    audio.currentTime = newTime;
+                }
             };
             
             const stopHandler = () => {
+                console.log('Stopped dragging scrubber');
                 isDraggingScrubber = false;
                 document.removeEventListener('mousemove', moveHandler);
                 document.removeEventListener('touchmove', moveHandler);
@@ -1267,43 +1298,4 @@
                 updateCallMetrics(callData);
                 updateCallTable(callData);
                 
-                document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
-                showAlert('Data refreshed successfully!', 'success');
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                showAlert(`Error: ${error.message}`, 'error');
-            } finally {
-                spinner.style.display = 'none';
-                btn.disabled = false;
-            }
-        }
-
-        // Close mini player with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeMiniPlayer();
-            }
-        });
-
-        // Close mini player by clicking overlay
-        document.getElementById('miniPlayerOverlay').addEventListener('click', (e) => {
-            if (e.target.id === 'miniPlayerOverlay') {
-                closeMiniPlayer();
-            }
-        });
-
-        // Responsive chart on window resize
-        window.addEventListener('resize', () => {
-            if (trafficChart) {
-                trafficChart.options.aspectRatio = window.innerWidth < 768 ? 1.5 : 3;
-                trafficChart.update();
-            }
-        });
-
-        window.addEventListener('load', () => {
-            initChart();
-            refreshAll();
-        });
-    </script>
-</body>
-</html>
+                document.getElementBy
