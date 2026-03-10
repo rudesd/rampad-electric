@@ -666,7 +666,7 @@
             const tbody = document.getElementById('callsBody');
             const calls = data.calls || [];
 
-            if (calls.length === 0) {
+            const callsWithRecordings = calls.filter(call => call.duration > 0);  if (callsWithRecordings.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
