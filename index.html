@@ -457,7 +457,7 @@
             border-radius: 6px;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .mini-player-scrubber-fill {
@@ -471,19 +471,21 @@
 
         .mini-player-scrubber-handle {
             position: absolute;
-            right: -10px;
+            left: 0;
             top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
             background: white;
             border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             cursor: grab;
+            z-index: 10;
         }
 
         .mini-player-scrubber-handle:active {
             cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.1);
         }
 
         .mini-player-time {
@@ -542,36 +544,39 @@
 
         .volume-slider {
             flex: 1;
-            height: 6px;
+            height: 8px;
             background: var(--border);
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             position: relative;
+            overflow: visible;
         }
 
         .volume-slider-fill {
             height: 100%;
             background: var(--accent-primary);
-            border-radius: 3px;
+            border-radius: 4px;
             width: 100%;
             position: relative;
         }
 
         .volume-slider-handle {
             position: absolute;
-            right: -8px;
+            left: 100%;
             top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
             background: white;
             border-radius: 50%;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
             cursor: grab;
+            z-index: 10;
         }
 
         .volume-slider-handle:active {
             cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.1);
         }
 
         .mini-player-speed {
@@ -820,9 +825,8 @@
             <div class="mini-player-controls">
                 <div class="mini-player-progress">
                     <div class="mini-player-scrubber" id="playerScrubber">
-                        <div class="mini-player-scrubber-fill" id="playerScrubberFill">
-                            <div class="mini-player-scrubber-handle" id="playerScrubberHandle"></div>
-                        </div>
+                        <div class="mini-player-scrubber-fill" id="playerScrubberFill"></div>
+                        <div class="mini-player-scrubber-handle" id="playerScrubberHandle"></div>
                     </div>
                     <div class="mini-player-time">
                         <span id="playerCurrentTime">0:00</span>
@@ -1103,6 +1107,7 @@
                 if (!isDraggingScrubber) {
                     const progress = (audio.currentTime / audio.duration) * 100;
                     scrubberFill.style.width = progress + '%';
+                    scrubberHandle.style.left = progress + '%';
                     document.getElementById('playerCurrentTime').textContent = formatTime(audio.currentTime);
                 }
             });
@@ -1119,6 +1124,7 @@
             audio.addEventListener('ended', () => {
                 playPauseBtn.textContent = '▶';
                 scrubberFill.style.width = '0%';
+                scrubberHandle.style.left = '0%';
             });
             
             // Scrubber click
@@ -1126,6 +1132,8 @@
                 const rect = scrubber.getBoundingClientRect();
                 const clickPosition = (e.clientX - rect.left) / rect.width;
                 audio.currentTime = clickPosition * audio.duration;
+                scrubberFill.style.width = (clickPosition * 100) + '%';
+                scrubberHandle.style.left = (clickPosition * 100) + '%';
             });
             
             // Scrubber drag
@@ -1138,6 +1146,7 @@
                 const clickPosition = (e.clientX - rect.left) / rect.width;
                 audio.volume = Math.max(0, Math.min(1, clickPosition));
                 volumeFill.style.width = (audio.volume * 100) + '%';
+                volumeHandle.style.left = (audio.volume * 100) + '%';
             });
             
             // Volume drag
@@ -1148,17 +1157,21 @@
         function startScrubberDrag(e) {
             isDraggingScrubber = true;
             e.preventDefault();
+            e.stopPropagation();
             
             const moveHandler = (e) => {
                 if (!isDraggingScrubber) return;
                 
                 const scrubber = document.getElementById('playerScrubber');
                 const audio = document.getElementById('miniPlayerAudio');
+                const scrubberFill = document.getElementById('playerScrubberFill');
+                const scrubberHandle = document.getElementById('playerScrubberHandle');
                 const rect = scrubber.getBoundingClientRect();
                 const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                 const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
                 
-                document.getElementById('playerScrubberFill').style.width = (position * 100) + '%';
+                scrubberFill.style.width = (position * 100) + '%';
+                scrubberHandle.style.left = (position * 100) + '%';
                 audio.currentTime = position * audio.duration;
             };
             
@@ -1179,17 +1192,21 @@
         function startVolumeDrag(e) {
             isDraggingVolume = true;
             e.preventDefault();
+            e.stopPropagation();
             
             const moveHandler = (e) => {
                 if (!isDraggingVolume) return;
                 
                 const volumeSlider = document.getElementById('volumeSlider');
                 const audio = document.getElementById('miniPlayerAudio');
+                const volumeFill = document.getElementById('volumeSliderFill');
+                const volumeHandle = document.getElementById('volumeSliderHandle');
                 const rect = volumeSlider.getBoundingClientRect();
                 const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                 const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
                 
-                document.getElementById('volumeSliderFill').style.width = (position * 100) + '%';
+                volumeFill.style.width = (position * 100) + '%';
+                volumeHandle.style.left = (position * 100) + '%';
                 audio.volume = position;
             };
             
