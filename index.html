@@ -677,8 +677,10 @@
                 return;
             }
 
-            tbody.innerHTML = calls.slice(0, 50).map((call, index) => {
-                const date = new Date(call.startTime);
+// Filter to only show calls with recordings
+const callsWithRecordings = calls.filter(call => call.duration > 0);
+
+tbody.innerHTML = callsWithRecordings.slice(0, 50).map((call, index) => {                const date = new Date(call.startTime);
                 const duration = Math.floor(call.duration / 60);
                 const seconds = call.duration % 60;
                 
