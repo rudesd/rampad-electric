@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rampad Electric - Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,6 +28,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -40,7 +41,7 @@
 
         .dashboard {
             min-height: 100vh;
-            padding: 2rem;
+            padding: 1.5rem;
             max-width: 1800px;
             margin: 0 auto;
             animation: fadeIn 0.6s ease-out;
@@ -52,13 +53,13 @@
         }
 
         header {
-            margin-bottom: 3rem;
-            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--border);
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
             letter-spacing: -0.02em;
             margin-bottom: 0.5rem;
@@ -71,9 +72,9 @@
         .header-meta {
             font-family: 'JetBrains Mono', monospace;
             color: var(--text-secondary);
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             align-items: center;
             margin-top: 0.5rem;
             flex-wrap: wrap;
@@ -83,15 +84,16 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text-primary);
-            padding: 0.5rem 1rem;
+            padding: 0.625rem 1rem;
             border-radius: 8px;
             cursor: pointer;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 44px;
         }
 
         .refresh-btn:hover:not(:disabled) {
@@ -109,8 +111,8 @@
 
         .loading-spinner {
             display: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid var(--border);
             border-top-color: var(--accent-primary);
             border-radius: 50%;
@@ -121,17 +123,42 @@
             to { transform: rotate(360deg); }
         }
 
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .time-tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
         .time-tab {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.875rem;
             background: transparent;
             border: none;
             color: var(--text-secondary);
             border-radius: 6px;
             cursor: pointer;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 600;
             transition: all 0.3s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
         }
 
         .time-tab:hover {
@@ -147,7 +174,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -170,14 +197,14 @@
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             box-shadow: 0 12px 30px var(--shadow);
             border-color: var(--accent-primary);
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 400;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -185,34 +212,41 @@
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .chart-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             margin-bottom: 2rem;
         }
 
         .chart-header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
         }
 
         .chart-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .chart-subtitle {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             margin-top: 0.25rem;
         }
@@ -221,28 +255,30 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1rem;
             overflow-x: auto;
             margin-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
         }
 
         .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
         }
 
         .table-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
 
         thead {
@@ -250,20 +286,21 @@
         }
 
         th {
-            padding: 1rem;
+            padding: 0.875rem 0.75rem;
             text-align: left;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-secondary);
             border-bottom: 2px solid var(--border);
+            white-space: nowrap;
         }
 
         td {
-            padding: 1rem;
+            padding: 0.875rem 0.75rem;
             border-bottom: 1px solid var(--border);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
 
         tbody tr {
@@ -276,11 +313,12 @@
 
         .call-status {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
+            padding: 0.25rem 0.625rem;
             border-radius: 12px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .call-status.completed {
@@ -305,7 +343,7 @@
             background: var(--accent-primary);
             border: none;
             color: var(--bg-primary);
-            padding: 0.5rem 1rem;
+            padding: 0.625rem 1rem;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.75rem;
@@ -314,6 +352,8 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 44px;
+            white-space: nowrap;
         }
 
         .play-btn:hover {
@@ -329,9 +369,9 @@
         .audio-player {
             display: none;
             background: var(--bg-secondary);
-            padding: 0.75rem;
+            padding: 1rem;
             border-radius: 8px;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
             border: 1px solid var(--border);
         }
 
@@ -349,44 +389,73 @@
             background: var(--accent-primary);
             border: none;
             color: var(--bg-primary);
-            width: 32px;
-            height: 32px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            transition: all 0.2s ease;
         }
 
         .audio-play-pause:hover {
             opacity: 0.8;
+            transform: scale(1.05);
         }
 
         .audio-progress-container {
             flex: 1;
-            height: 6px;
+            height: 8px;
             background: var(--border);
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             position: relative;
+            touch-action: none;
+        }
+
+        .audio-progress-container:hover {
+            height: 10px;
         }
 
         .audio-progress-bar {
             height: 100%;
             background: var(--accent-primary);
-            border-radius: 3px;
+            border-radius: 4px;
             width: 0%;
             transition: width 0.1s;
+            position: relative;
+        }
+
+        .audio-scrubber {
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            border: 3px solid var(--bg-primary);
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .audio-progress-container:hover .audio-scrubber,
+        .audio-progress-bar:hover .audio-scrubber {
+            opacity: 1;
         }
 
         .audio-time {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
-            min-width: 80px;
+            min-width: 90px;
             text-align: right;
+            flex-shrink: 0;
         }
 
         .alert {
@@ -395,21 +464,24 @@
             margin-bottom: 1rem;
             display: none;
             position: fixed;
-            top: 2rem;
-            right: 2rem;
+            top: 1rem;
+            right: 1rem;
+            left: 1rem;
             max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
             z-index: 1000;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         .alert.show {
             display: block;
-            animation: slideInRight 0.3s ease-out;
+            animation: slideInDown 0.3s ease-out;
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        @keyframes slideInDown {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .alert-error {
@@ -424,26 +496,85 @@
             color: white;
         }
 
-        @media (max-width: 768px) {
+        @media (min-width: 768px) {
             .dashboard {
-                padding: 1rem;
+                padding: 2rem;
             }
 
             h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .stat-value {
                 font-size: 2rem;
             }
 
-            table {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .chart-card, .table-card {
+                padding: 1.5rem;
+            }
+
+            .table-title {
+                font-size: 1.25rem;
+            }
+
+            th {
                 font-size: 0.75rem;
             }
 
-            th, td {
-                padding: 0.75rem 0.5rem;
+            td {
+                font-size: 0.875rem;
+            }
+
+            .audio-progress-container {
+                height: 6px;
+            }
+
+            .audio-progress-container:hover {
+                height: 8px;
+            }
+
+            .audio-scrubber {
+                width: 12px;
+                height: 12px;
+                right: -6px;
+            }
+
+            .audio-play-pause {
+                width: 36px;
+                height: 36px;
             }
 
             .alert {
-                right: 1rem;
-                max-width: calc(100% - 2rem);
+                right: 2rem;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .time-tab {
+                font-size: 0.7rem;
+                padding: 0.5rem 0.625rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            table {
+                min-width: 500px;
             }
         }
     </style>
@@ -462,9 +593,9 @@
         </header>
 
         <!-- Website Analytics -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 600;">Website Analytics</h2>
-            <div style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
+        <div class="section-header">
+            <h2 class="section-title">Website Analytics</h2>
+            <div class="time-tabs">
                 <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
                 <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
                 <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
@@ -481,9 +612,9 @@
         </div>
 
         <!-- Website Stats - All Time -->
-        <div style="margin-bottom: 3rem;">
-            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">All Time Statistics</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+        <div style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">All Time Statistics</h3>
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Website Views</div>
                     <div class="stat-value" id="totalViews">-</div>
@@ -496,9 +627,9 @@
         </div>
 
         <!-- Call Stats -->
-        <div style="margin-bottom: 3rem;">
-            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">Call Statistics</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+        <div style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">Call Statistics</h3>
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Total Calls</div>
                     <div class="stat-value" id="totalCalls">-</div>
@@ -587,7 +718,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    aspectRatio: 3,
+                    aspectRatio: window.innerWidth < 768 ? 1.5 : 3,
                     plugins: {
                         legend: {
                             labels: {
@@ -599,7 +730,11 @@
                     scales: {
                         x: {
                             grid: { color: '#2d3748', drawBorder: false },
-                            ticks: { color: '#9ca3af' }
+                            ticks: { 
+                                color: '#9ca3af',
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
                         },
                         y: {
                             grid: { color: '#2d3748', drawBorder: false },
@@ -704,13 +839,15 @@
                         <td><span class="call-status ${statusClass}">${statusText}</span></td>
                         <td>
                             <button class="play-btn" onclick="toggleRecording('${call.sid}', 'player-${index}')">
-                                <span id="btn-icon-${index}">▶</span> Play
+                                <span id="btn-icon-${index}">▶</span> <span>Play</span>
                             </button>
                             <div class="audio-player" id="player-${index}">
                                 <div class="audio-controls">
                                     <button class="audio-play-pause" onclick="togglePlayPause('player-${index}')" id="playpause-${index}">▶</button>
                                     <div class="audio-progress-container" onclick="seek(event, 'player-${index}')">
-                                        <div class="audio-progress-bar" id="progress-${index}"></div>
+                                        <div class="audio-progress-bar" id="progress-${index}">
+                                            <div class="audio-scrubber"></div>
+                                        </div>
                                     </div>
                                     <div class="audio-time" id="time-${index}">0:00 / 0:00</div>
                                 </div>
@@ -815,7 +952,8 @@
             const playerNum = playerId.split('-')[1];
             const audio = document.getElementById('audio-' + playerNum);
             const progressContainer = event.currentTarget;
-            const clickPosition = event.offsetX / progressContainer.offsetWidth;
+            const rect = progressContainer.getBoundingClientRect();
+            const clickPosition = (event.clientX - rect.left) / rect.width;
             audio.currentTime = clickPosition * audio.duration;
         }
 
@@ -859,6 +997,14 @@
                 btn.disabled = false;
             }
         }
+
+        // Responsive chart on window resize
+        window.addEventListener('resize', () => {
+            if (trafficChart) {
+                trafficChart.options.aspectRatio = window.innerWidth < 768 ? 1.5 : 3;
+                trafficChart.update();
+            }
+        });
 
         window.addEventListener('load', () => {
             initChart();
