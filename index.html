@@ -712,7 +712,7 @@
         }
 
         async function fetchWebsiteAnalytics() {
-            const response = await fetch(`${BACKEND_URL}/api/jetpack/rampad`);
+            const response = await fetch(`${BACKEND_URL}/api/analytics/rampad`);
             if (!response.ok) throw new Error('Failed to fetch website analytics');
             return await response.json();
         }
