@@ -742,29 +742,34 @@
         }
 
         function updateAnalytics(data) {
-            // Update overview stats
-            document.getElementById('activeUsers').textContent = data.overview.activeUsers.toLocaleString();
-            document.getElementById('newUsers').textContent = data.overview.newUsers.toLocaleString();
-            document.getElementById('totalViews').textContent = data.overview.totalViews.toLocaleString();
+    // Update overview stats
+    document.getElementById('activeUsers').textContent = data.overview.activeUsers.toLocaleString();
+    document.getElementById('newUsers').textContent = data.overview.newUsers.toLocaleString();
+    document.getElementById('totalViews').textContent = data.overview.totalViews.toLocaleString();
 
-            // Update daily chart
-            const labels = data.dailyData.map(d => formatDate(d.date));
-            const views = data.dailyData.map(d => d.views);
-            const newUsers = data.dailyData.map(d => d.newUsers);
-            
-            dailyChart.data.labels = labels;
-            dailyChart.data.datasets[0].data = views;
-            dailyChart.data.datasets[1].data = newUsers;
-            dailyChart.update();
+    // Sort daily data by date BEFORE charting
+    const sortedData = [...data.dailyData].sort((a, b) => {
+        return a.date.localeCompare(b.date); // YYYYMMDD format sorts naturally
+    });
 
-            // Update channel chart
-            channelChart.data.labels = data.channels.map(c => c.channel);
-            channelChart.data.datasets[0].data = data.channels.map(c => c.users);
-            channelChart.update();
+    // Update daily chart with SORTED data
+    const labels = sortedData.map(d => formatDate(d.date));
+    const views = sortedData.map(d => d.views);
+    const newUsers = sortedData.map(d => d.newUsers);
+    
+    dailyChart.data.labels = labels;
+    dailyChart.data.datasets[0].data = views;
+    dailyChart.data.datasets[1].data = newUsers;
+    dailyChart.update();
 
-            // Update top pages table
-            updatePagesTable(data.topPages);
-        }
+    // Update channel chart
+    channelChart.data.labels = data.channels.map(c => c.channel);
+    channelChart.data.datasets[0].data = data.channels.map(c => c.users);
+    channelChart.update();
+
+    // Update top pages table
+    updatePagesTable(data.topPages);
+}
 
         function updatePagesTable(pages) {
             const tbody = document.getElementById('pagesBody');
