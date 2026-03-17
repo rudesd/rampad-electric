@@ -127,54 +127,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             gap: 1rem;
             flex-wrap: wrap;
         }
 
         .section-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
-        }
-
-        .time-tabs {
-            display: flex;
-            gap: 0.25rem;
-            background: var(--bg-secondary);
-            padding: 0.25rem;
-            border-radius: 8px;
-        }
-
-        .time-tab {
-            padding: 0.5rem 0.875rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-        }
-
-        .time-tab:hover {
-            color: var(--accent-primary);
-        }
-
-        .time-tab.active {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1.5rem;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -204,15 +171,15 @@
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 400;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .stat-value {
-            font-size: 1.75rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1;
@@ -220,8 +187,8 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
@@ -229,33 +196,40 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.25rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .chart-header {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
         }
 
         .chart-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .chart-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             color: var(--text-secondary);
             margin-top: 0.25rem;
+        }
+
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .table-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.5rem;
             overflow-x: auto;
             margin-bottom: 2rem;
             -webkit-overflow-scrolling: touch;
@@ -271,7 +245,7 @@
         }
 
         .table-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
         }
 
@@ -289,7 +263,7 @@
             padding: 0.875rem 0.75rem;
             text-align: left;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-secondary);
@@ -300,7 +274,7 @@
         td {
             padding: 0.875rem 0.75rem;
             border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
+            font-size: 0.875rem;
         }
 
         tbody tr {
@@ -486,42 +460,22 @@
             }
 
             .section-title {
-                font-size: 1.5rem;
-            }
-
-            .stat-value {
-                font-size: 2rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 1.5rem;
-            }
-
-            .chart-card, .table-card {
-                padding: 1.5rem;
-            }
-
-            .table-title {
-                font-size: 1.25rem;
-            }
-
-            th {
-                font-size: 0.75rem;
-            }
-
-            td {
-                font-size: 0.875rem;
+                font-size: 1.75rem;
             }
 
             .alert {
                 right: 2rem;
                 left: auto;
             }
+        }
 
-            .audio-play-pause {
-                width: 36px;
-                height: 36px;
+        @media (max-width: 768px) {
+            .two-col-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                min-width: 500px;
             }
         }
 
@@ -530,17 +484,8 @@
                 font-size: 1.5rem;
             }
 
-            .time-tab {
-                font-size: 0.7rem;
-                padding: 0.5rem 0.625rem;
-            }
-
             .stat-value {
-                font-size: 1.5rem;
-            }
-
-            table {
-                min-width: 500px;
+                font-size: 2rem;
             }
         }
     </style>
@@ -558,52 +503,82 @@
             </div>
         </header>
 
-        <!-- Website Analytics -->
+        <!-- User Overview Stats -->
         <div class="section-header">
-            <h2 class="section-title">Website Analytics</h2>
-            <div class="time-tabs">
-                <button class="time-tab active" onclick="changeWebsitePeriod('week')" data-period="week">7 Days</button>
-                <button class="time-tab" onclick="changeWebsitePeriod('month')" data-period="month">30 Days</button>
-                <button class="time-tab" onclick="changeWebsitePeriod('quarter')" data-period="quarter">90 Days</button>
+            <h2 class="section-title">User Overview (Last 30 Days)</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value" id="activeUsers">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">New Users</div>
+                <div class="stat-value" id="newUsers">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Views</div>
+                <div class="stat-value" id="totalViews">-</div>
             </div>
         </div>
 
-        <!-- Traffic Chart -->
+        <!-- Daily Traffic Chart -->
         <div class="chart-card">
             <div class="chart-header">
-                <h3 class="chart-title">Website Traffic</h3>
-                <p class="chart-subtitle" id="chartSubtitle">Last 7 days</p>
+                <h3 class="chart-title">Daily Traffic</h3>
+                <p class="chart-subtitle">Last 30 days</p>
             </div>
-            <canvas id="trafficChart"></canvas>
+            <canvas id="dailyChart"></canvas>
         </div>
 
-        <!-- Website Stats - All Time -->
-        <div style="margin-bottom: 2rem;">
-            <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">All Time Statistics</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Website Views</div>
-                    <div class="stat-value" id="totalViews">-</div>
+        <!-- Two Column: Traffic Sources & Top Pages -->
+        <div class="two-col-grid">
+            <!-- Traffic Sources Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Traffic Sources</h3>
+                    <p class="chart-subtitle">New users by channel</p>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Visitors</div>
-                    <div class="stat-value" id="totalVisitors">-</div>
+                <canvas id="channelChart"></canvas>
+            </div>
+
+            <!-- Top Pages Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3 class="table-title">📄 Top Pages</h3>
                 </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Page Title</th>
+                            <th>Views</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pagesBody">
+                        <tr>
+                            <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                Loading page data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Call Stats -->
-        <div style="margin-bottom: 2rem;">
-            <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;">Call Statistics</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Calls</div>
-                    <div class="stat-value" id="totalCalls">-</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Today's Calls</div>
-                    <div class="stat-value" id="todayCalls">-</div>
-                </div>
+        <div class="section-header">
+            <h2 class="section-title">Call Statistics</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Calls</div>
+                <div class="stat-value" id="totalCalls">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Calls</div>
+                <div class="stat-value" id="todayCalls">-</div>
             </div>
         </div>
 
@@ -638,9 +613,8 @@
     <script>
         const BACKEND_URL = 'https://analytics-backend-production-e34a.up.railway.app';
         
-        let trafficChart;
-        let websitePeriod = 'week';
-        let cachedWebsiteData = null;
+        let dailyChart;
+        let channelChart;
 
         function showAlert(message, type) {
             const alert = document.getElementById('alert');
@@ -649,42 +623,38 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        function changeWebsitePeriod(period) {
-            websitePeriod = period;
-            
-            document.querySelectorAll('.time-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`[data-period="${period}"]`).classList.add('active');
-            
-            const periodText = period === 'week' ? 'Last 7 days' : period === 'month' ? 'Last 30 days' : 'Last 90 days';
-            document.getElementById('chartSubtitle').textContent = periodText;
-            
-            if (cachedWebsiteData) {
-                updateWebsiteMetrics(cachedWebsiteData);
-            }
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('trafficChart').getContext('2d');
-            trafficChart = new Chart(ctx, {
+        function initCharts() {
+            // Daily traffic chart
+            const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            dailyChart = new Chart(dailyCtx, {
                 type: 'line',
                 data: {
                     labels: [],
-                    datasets: [{
-                        label: 'Views',
-                        data: [],
-                        borderColor: '#00d9ff',
-                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    }]
+                    datasets: [
+                        {
+                            label: 'Page Views',
+                            data: [],
+                            borderColor: '#00d9ff',
+                            backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'New Users',
+                            data: [],
+                            borderColor: '#7c3aed',
+                            backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    aspectRatio: window.innerWidth < 768 ? 1.5 : 3,
+                    aspectRatio: window.innerWidth < 768 ? 1.5 : 2.5,
                     plugins: {
                         legend: {
                             labels: {
@@ -709,11 +679,51 @@
                     }
                 }
             });
+
+            // Channel chart (bar chart)
+            const channelCtx = document.getElementById('channelChart').getContext('2d');
+            channelChart = new Chart(channelCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'New Users',
+                        data: [],
+                        backgroundColor: [
+                            'rgba(0, 217, 255, 0.8)',
+                            'rgba(124, 58, 237, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: window.innerWidth < 768 ? 1 : 1.5,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#9ca3af' }
+                        },
+                        y: {
+                            grid: { color: '#2d3748', drawBorder: false },
+                            ticks: { color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
         }
 
-        async function fetchWebsiteAnalytics() {
+        async function fetchAnalytics() {
             const response = await fetch(`${BACKEND_URL}/api/analytics/rampad`);
-            if (!response.ok) throw new Error('Failed to fetch website analytics');
+            if (!response.ok) throw new Error('Failed to fetch analytics');
             return await response.json();
         }
 
@@ -723,33 +733,59 @@
             return await response.json();
         }
 
-        function updateWebsiteMetrics(data) {
-            cachedWebsiteData = data;
-            
-            const stats = data.stats || {};
-            
-            document.getElementById('totalViews').textContent = (stats.views || 0).toLocaleString();
-            document.getElementById('totalVisitors').textContent = (stats.visitors || 0).toLocaleString();
+        function formatDate(dateString) {
+            // Convert YYYYMMDD to readable format
+            const year = dateString.substring(0, 4);
+            const month = dateString.substring(4, 6);
+            const day = dateString.substring(6, 8);
+            return `${month}/${day}`;
+        }
 
-            const visits = data.visits?.data || [];
-            if (visits.length > 0) {
-                let filteredVisits = visits;
-                
-                if (websitePeriod === 'week') {
-                    filteredVisits = visits.slice(-7);
-                } else if (websitePeriod === 'month') {
-                    filteredVisits = visits.slice(-30);
-                } else if (websitePeriod === 'quarter') {
-                    filteredVisits = visits.slice(-90);
-                }
-                
-                const labels = filteredVisits.map(v => v[0]);
-                const values = filteredVisits.map(v => v[1]);
-                
-                trafficChart.data.labels = labels;
-                trafficChart.data.datasets[0].data = values;
-                trafficChart.update();
+        function updateAnalytics(data) {
+            // Update overview stats
+            document.getElementById('activeUsers').textContent = data.overview.activeUsers.toLocaleString();
+            document.getElementById('newUsers').textContent = data.overview.newUsers.toLocaleString();
+            document.getElementById('totalViews').textContent = data.overview.totalViews.toLocaleString();
+
+            // Update daily chart
+            const labels = data.dailyData.map(d => formatDate(d.date));
+            const views = data.dailyData.map(d => d.views);
+            const newUsers = data.dailyData.map(d => d.newUsers);
+            
+            dailyChart.data.labels = labels;
+            dailyChart.data.datasets[0].data = views;
+            dailyChart.data.datasets[1].data = newUsers;
+            dailyChart.update();
+
+            // Update channel chart
+            channelChart.data.labels = data.channels.map(c => c.channel);
+            channelChart.data.datasets[0].data = data.channels.map(c => c.users);
+            channelChart.update();
+
+            // Update top pages table
+            updatePagesTable(data.topPages);
+        }
+
+        function updatePagesTable(pages) {
+            const tbody = document.getElementById('pagesBody');
+
+            if (pages.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            No page data found
+                        </td>
+                    </tr>
+                `;
+                return;
             }
+
+            tbody.innerHTML = pages.map(page => `
+                <tr>
+                    <td><strong>${page.title}</strong></td>
+                    <td>${page.views.toLocaleString()}</td>
+                </tr>
+            `).join('');
         }
 
         function updateCallMetrics(data) {
@@ -940,12 +976,12 @@
             btn.disabled = true;
 
             try {
-                const [websiteData, callData] = await Promise.all([
-                    fetchWebsiteAnalytics(),
+                const [analyticsData, callData] = await Promise.all([
+                    fetchAnalytics(),
                     fetchCallLogs()
                 ]);
                 
-                updateWebsiteMetrics(websiteData);
+                updateAnalytics(analyticsData);
                 updateCallMetrics(callData);
                 updateCallTable(callData);
                 
@@ -961,14 +997,18 @@
         }
 
         window.addEventListener('resize', () => {
-            if (trafficChart) {
-                trafficChart.options.aspectRatio = window.innerWidth < 768 ? 1.5 : 3;
-                trafficChart.update();
+            if (dailyChart) {
+                dailyChart.options.aspectRatio = window.innerWidth < 768 ? 1.5 : 2.5;
+                dailyChart.update();
+            }
+            if (channelChart) {
+                channelChart.options.aspectRatio = window.innerWidth < 768 ? 1 : 1.5;
+                channelChart.update();
             }
         });
 
         window.addEventListener('load', () => {
-            initChart();
+            initCharts();
             refreshAll();
         });
     </script>
